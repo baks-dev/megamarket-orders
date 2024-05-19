@@ -1,0 +1,13 @@
+# Role
+
+ROLE_MEGAMARKET_ORDERS:
+  name: 'Megamarket Orders'
+  desc: 'Orders of Megamarket goods'
+
+ROLE_MEGAMARKET_ORDERS_INDEX:
+  name: 'View'
+  desc: ''
+
+ROLE_MEGAMARKET_ORDERS_GET:
+  name: 'Get new'
+  desc: 'Get new orders from the Market'

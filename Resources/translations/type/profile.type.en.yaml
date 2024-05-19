@@ -1,0 +1,14 @@
+yandex:
+  name: 'Megamarket'
+  desc: 'Megamarket User'
+
+  section:
+    contact:
+      name: 'Contact details'
+      desc: 'Data for communication between store managers and customers.'
+
+      field:
+
+        name:
+          name: 'Contact person'
+          desc: 'User name'

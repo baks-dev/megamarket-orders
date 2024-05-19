@@ -1,0 +1,15 @@
+# Роль
+
+ROLE_MEGAMARKET_ORDERS:
+  name: 'Заказы Megamarket'
+  desc: 'Заказы товаров Megamarket'
+
+ROLE_MEGAMARKET_ORDERS_INDEX:
+  name: 'Просмотр'
+  desc: ''
+
+
+ROLE_MEGAMARKET_ORDERS_GET:
+  name: 'Получить новые'
+  desc: 'Получить новые заказы с Market'
+
