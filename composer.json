@@ -30,7 +30,7 @@
   },
   "autoload": {
     "psr-4": {
-      "BaksDev\\Yandex\\Market\\Orders\\": ""
+      "BaksDev\\Megamarket\\Orders\\": ""
     }
   },
   "config": {
