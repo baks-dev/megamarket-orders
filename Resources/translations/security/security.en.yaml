@@ -1,7 +1,7 @@
 # Role
 
 ROLE_MEGAMARKET_ORDERS:
-  name: 'Megamarket Orders'
+  name: 'Orders'
   desc: 'Orders of Megamarket goods'
 
 ROLE_MEGAMARKET_ORDERS_INDEX:
