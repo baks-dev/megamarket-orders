@@ -1,7 +1,7 @@
 # Роль
 
 ROLE_MEGAMARKET_ORDERS:
-  name: 'Заказы'
+  name: 'Заказы Megamarket'
   desc: 'Заказы товаров Megamarket'
 
 ROLE_MEGAMARKET_ORDERS_INDEX:
