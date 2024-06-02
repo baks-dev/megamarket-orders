@@ -23,19 +23,28 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Megamarket\Orders\Messenger;
+namespace BaksDev\Megamarket\Orders\Controller\Megamarket;
 
-use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface;
-use BaksDev\Megamarket\Orders\Api\YandexMarketAllOrdersRequest;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use BaksDev\Core\Controller\AbstractController;
+use stdClass;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Annotation\Route;
 
-#[AsMessageHandler]
-final class YandexMarketOrdersDispatcher
+#[AsController]
+final class CancelController extends AbstractController
 {
-    public function __invoke(YandexMarketOrdersMessage $message): void
+    /**
+     * Метод принимает запросы на отмену заказа мегамаркет
+     */
+    #[Route('/megamarket/order/cancel', name: 'megamarket.order.cancel', methods: ['GET', 'POST'])]
+    public function index(
+        Request $request
+    ): Response
     {
 
+        return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(),  'success' => 1]);
     }
-
 }

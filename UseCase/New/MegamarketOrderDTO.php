@@ -62,70 +62,46 @@ final class MegamarketOrderDTO implements OrderEventInterface
     /** Ответственный */
     private ?UserProfileUid $profile = null;
 
-    public function __construct(array $order, )
+    public function __construct(array $order)
     {
 
-        $this->number = (string) $order['id'];
+        $this->number = (string) $order['shipmentId'];
+
         $this->created = new DateTimeImmutable($order['creationDate']);
 
         $this->product = new ArrayCollection();
         $this->usr = new User\OrderUserDTO();
 
-
-        /** Дата доставки */
-        $shipments = current($order['delivery']['shipments']);
-        $deliveryDate = new DateTimeImmutable($shipments['shipmentDate'].' '.$shipments['shipmentTime']);
+        /** Крайняя дата доставки */
+        $deliveryDate = new DateTimeImmutable($order['shippingTimeLimit']);
 
         $OrderDeliveryDTO = $this->usr->getDelivery();
         $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
 
 
-        $address = $order['delivery']['address'];
+        //$address = $order['delivery']['address'];
 
         /** Геолокация клиента */
-        $OrderDeliveryDTO->setLatitude(new GpsLatitude($address['gps']['latitude']));
-        $OrderDeliveryDTO->setLongitude(new GpsLongitude($address['gps']['longitude']));
-
+        //$OrderDeliveryDTO->setLatitude(new GpsLatitude($address['gps']['latitude']));
+        //$OrderDeliveryDTO->setLongitude(new GpsLongitude($address['gps']['longitude']));
 
         /** Адрес доставки клиента */
-        $addressClient = $address['country'];
-        $addressClient .= isset($address['city']) ? ', '.$address['city'] : null;
-
-        if(isset($address['street']))
-        {
-            if(mb_strpos($address['street'], 'улица'))
-            {
-                $addressClient .= ', '.$address['street'];
-            }
-            else
-            {
-                $addressClient .= ', улица '.$address['street'];
-            }
-        }
-
-        $addressClient .= isset($address['house']) ? ' '.$address['house'] : null;
-
-        $addressClient .= isset($address['block']) ? 'к'.$address['block'] : null;
-
-        $addressClient .= isset($address['entrance']) ? ', под.'.$address['entrance'] : null;
-
-        $OrderDeliveryDTO->setAddress($addressClient);
+        $OrderDeliveryDTO->setAddress($order['customerAddress']);
 
 
         /** Продукция */
-
         foreach($order['items'] as $item)
         {
             $NewOrderProductDTO = new Products\NewOrderProductDTO($item['offerId']);
 
             $NewOrderPriceDTO = $NewOrderProductDTO->getPrice();
 
-            $Money = new Money($item['priceBeforeDiscount']); // Стоимость товара в валюте магазина до применения скидок.
-            $Currency = new Currency($order['currency']);
+            $Money = new Money($item['price']); // Стоимость товара в валюте магазина до применения скидок.
+            $Currency = new Currency(); // Валюта по умолчанию
 
             $NewOrderPriceDTO->setPrice($Money);
             $NewOrderPriceDTO->setCurrency($Currency);
-            $NewOrderPriceDTO->setTotal($item['count']);
+            $NewOrderPriceDTO->setTotal($item['quantity']);
 
             $this->addProduct($NewOrderProductDTO);
 

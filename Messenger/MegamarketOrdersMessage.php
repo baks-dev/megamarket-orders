@@ -23,33 +23,16 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Megamarket\Orders\Controller;
+namespace BaksDev\Megamarket\Orders\Messenger;
+
+use Symfony\Component\Validator\Constraints as Assert;
 
 
-use BaksDev\Core\Form\Search\SearchDTO;
-use BaksDev\Core\Form\Search\SearchForm;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use BaksDev\Core\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
-use Symfony\Component\HttpKernel\Attribute\AsController;
-
-#[AsController]
-#[RoleSecurity('ROLE_MEGAMARKET_ORDERS')]
-final class OrderController extends AbstractController
+final class MegamarketOrdersMessage
 {
-    /**
-     * Метод принимает запросы на создание заказа мегамаркет
-     */
-    #[Route('/admin/megamarket/order', name: 'admin.index', methods: ['GET', 'POST'])]
-    public function index(
-        Request $request
-    ): Response
-    {
 
-        return new JsonResponse(['success' => 'ok']);
+    /** Идентификатор */
+    #[Assert\Uuid]
+    private $id = null;
 
-    }
 }

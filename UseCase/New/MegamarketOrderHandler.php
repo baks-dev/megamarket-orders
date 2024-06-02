@@ -38,6 +38,7 @@ use BaksDev\Files\Resources\Upload\Image\ImageUploadInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Products\Product\Repository\ProductByArticle\ProductEventByArticleInterface;
 use BaksDev\Users\Address\Services\GeocodeAddressParser;
 use BaksDev\Users\Address\UseCase\Geocode\GeocodeAddressDTO;
 use BaksDev\Users\Address\UseCase\Geocode\GeocodeAddressHandler;
@@ -45,7 +46,7 @@ use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Repository\CurrentUserProfileEvent\CurrentUserProfileEventInterface;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\UserProfileHandler;
 use BaksDev\Megamarket\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
-use BaksDev\Megamarket\Products\Repository\Card\CurrentProductEvent\CurrentProductEventByArticleInterface;
+
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -60,7 +61,7 @@ final class MegamarketOrderHandler extends AbstractHandler
 
     private CurrentUserProfileEventInterface $currentUserProfileEvent;
     private UserProfileHandler $profileHandler;
-    private CurrentProductEventByArticleInterface $currentProductEventByArticle;
+    private ProductEventByArticleInterface $currentProductEventByArticle;
     private FieldByDeliveryChoiceInterface $fieldByDeliveryChoice;
     private CurrentDeliveryEventInterface $currentDeliveryEvent;
     private GeocodeAddressParser $geocodeAddressParser;
@@ -79,7 +80,7 @@ final class MegamarketOrderHandler extends AbstractHandler
         TokenStorageInterface $tokenStorage,
 
 
-        CurrentProductEventByArticleInterface $currentProductEventByArticle,
+        ProductEventByArticleInterface $currentProductEventByArticle,
         FieldByDeliveryChoiceInterface $fieldByDeliveryChoice,
         CurrentDeliveryEventInterface $currentDeliveryEvent,
         GeocodeAddressParser $geocodeAddressParser,
@@ -105,13 +106,16 @@ final class MegamarketOrderHandler extends AbstractHandler
 
     public function handle(MegamarketOrderDTO $command): string|Order
     {
+        dd($command);
+
+
         /**
          * Получаем события продукции
          * @var Products\NewOrderProductDTO $product
          */
         foreach($command->getProduct() as $product)
         {
-            $ProductData = $this->currentProductEventByArticle->find($product->getArticle());
+            $ProductData = $this->currentProductEventByArticle->findProductEventByArticle($product->getArticle());
 
             if(!$ProductData)
             {

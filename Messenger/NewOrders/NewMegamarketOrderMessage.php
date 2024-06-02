@@ -23,16 +23,39 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Megamarket\Orders\Messenger;
+namespace BaksDev\Megamarket\Orders\Messenger\NewOrders;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-final class YandexMarketOrdersMessage
+final class NewMegamarketOrderMessage
 {
 
-    /** Идентификатор */
-    #[Assert\Uuid]
-    private $id = null;
+    /** Идентификатор магазина */
+    private int $company;
 
+    /** Идентификатор заказа */
+    private string $shipment;
+
+    public function __construct(int|string $shipment, int $company) {
+
+        $this->shipment = (string) $shipment;
+        $this->company = $company;
+    }
+
+    /**
+     * Company
+     */
+    public function getCompany(): int
+    {
+        return $this->company;
+    }
+
+    /**
+     * Id
+     */
+    public function getShipment(): string
+    {
+        return $this->shipment;
+    }
 }
