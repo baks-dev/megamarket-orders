@@ -32,23 +32,19 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Core\Type\Field\InputField;
 use BaksDev\Core\Validator\ValidatorCollectionInterface;
 use BaksDev\Delivery\Repository\CurrentDeliveryEvent\CurrentDeliveryEventInterface;
-use BaksDev\Delivery\Repository\FieldByDeliveryChoice\FieldByDeliveryChoiceInterface;
 use BaksDev\Files\Resources\Upload\File\FileUploadInterface;
 use BaksDev\Files\Resources\Upload\Image\ImageUploadInterface;
+use BaksDev\Megamarket\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Orders\Order\Repository\FieldByDeliveryChoice\FieldByDeliveryChoiceInterface;
 use BaksDev\Products\Product\Repository\ProductByArticle\ProductEventByArticleInterface;
 use BaksDev\Users\Address\Services\GeocodeAddressParser;
-use BaksDev\Users\Address\UseCase\Geocode\GeocodeAddressDTO;
-use BaksDev\Users\Address\UseCase\Geocode\GeocodeAddressHandler;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Repository\CurrentUserProfileEvent\CurrentUserProfileEventInterface;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\UserProfileHandler;
-use BaksDev\Megamarket\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
-
 use Doctrine\ORM\EntityManagerInterface;
-use DomainException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -62,7 +58,7 @@ final class MegamarketOrderHandler extends AbstractHandler
     private CurrentUserProfileEventInterface $currentUserProfileEvent;
     private UserProfileHandler $profileHandler;
     private ProductEventByArticleInterface $currentProductEventByArticle;
-    private FieldByDeliveryChoiceInterface $fieldByDeliveryChoice;
+    private FieldByDeliveryChoiceInterface $deliveryFields;
     private CurrentDeliveryEventInterface $currentDeliveryEvent;
     private GeocodeAddressParser $geocodeAddressParser;
 
@@ -81,7 +77,7 @@ final class MegamarketOrderHandler extends AbstractHandler
 
 
         ProductEventByArticleInterface $currentProductEventByArticle,
-        FieldByDeliveryChoiceInterface $fieldByDeliveryChoice,
+        FieldByDeliveryChoiceInterface $deliveryFields,
         CurrentDeliveryEventInterface $currentDeliveryEvent,
         GeocodeAddressParser $geocodeAddressParser,
 
@@ -99,7 +95,7 @@ final class MegamarketOrderHandler extends AbstractHandler
 
 
         $this->currentProductEventByArticle = $currentProductEventByArticle;
-        $this->fieldByDeliveryChoice = $fieldByDeliveryChoice;
+        $this->deliveryFields = $deliveryFields;
         $this->currentDeliveryEvent = $currentDeliveryEvent;
         $this->geocodeAddressParser = $geocodeAddressParser;
     }
@@ -143,7 +139,7 @@ final class MegamarketOrderHandler extends AbstractHandler
         }
 
 
-        $fields = $this->fieldByDeliveryChoice->fetchDeliveryFields($OrderDeliveryDTO->getDelivery());
+        $fields = $this->deliveryFields->fetchDeliveryFields($OrderDeliveryDTO->getDelivery());
 
         $address_field = array_filter($fields, function($v) {
 
