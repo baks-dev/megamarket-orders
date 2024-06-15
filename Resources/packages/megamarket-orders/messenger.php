@@ -31,8 +31,8 @@ return static function(FrameworkConfig $framework) {
 
     $messenger
         ->transport('megamarket-orders')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'megamarket-orders'])
+        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
+        ->options(['stream' => 'megamarket-orders'])
         ->failureTransport('failed-megamarket-orders')
         ->retryStrategy()
         ->maxRetries(3)
@@ -43,7 +43,9 @@ return static function(FrameworkConfig $framework) {
 
     ;
 
-    $messenger->transport('failed-megamarket-orders')
+    $failure = $framework->messenger();
+
+    $failure->transport('failed-megamarket-orders')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
         ->options(['queue_name' => 'failed-megamarket-orders'])
     ;
