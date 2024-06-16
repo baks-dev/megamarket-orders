@@ -1,6 +1,6 @@
 # BaksDev Orders Megamarket
 
-[![Version](https://img.shields.io/badge/version-7.1.5-blue)](https://github.com/baks-dev/megamarket-orders/releases)
+[![Version](https://img.shields.io/badge/version-7.1.6-blue)](https://github.com/baks-dev/megamarket-orders/releases)
 ![php 8.3+](https://img.shields.io/badge/php-min%208.3-red.svg)
 
 Модуль заказов Megamarket
@@ -8,7 +8,18 @@
 ## Установка
 
 ``` bash
-$ composer require baks-dev/megamarket-orders
+composer require \
+baks-dev/megamarket \
+baks-dev/megamarket-orders
+```
+
+При первоначальной установке пакета автоматически выполнится консольная комманда на добавление тип профиля,
+доставку и способ оплаты «Megamarket»:
+
+``` bash
+php bin/console baks:users-profile-type:megamarket
+php bin/console baks:payment:megamarket
+php bin/console baks:delivery:megamarket
 ```
 
 ## Дополнительно
@@ -16,29 +27,20 @@ $ composer require baks-dev/megamarket-orders
 Установка конфигурации и файловых ресурсов:
 
 ``` bash
-$ php bin/console baks:assets:install
-```
-
-Добавить тип профиля и доставку Megamarket
-
-``` bash
-$ php bin/console baks:users-profile-type:megamarket
-$ php bin/console baks:payment:megamarket
-$ php bin/console baks:delivery:megamarket
+php bin/console baks:assets:install
 ```
 
 Изменения в схеме базы данных с помощью миграции
 
 ``` bash
-$ php bin/console doctrine:migrations:diff
-
-$ php bin/console doctrine:migrations:migrate
+php bin/console doctrine:migrations:diff
+php bin/console doctrine:migrations:migrate
 ```
 
 ## Тестирование
 
 ``` bash
-$ php bin/phpunit --group=megamarket-orders
+php bin/phpunit --group=megamarket-orders
 ```
 
 ## Лицензия ![License](https://img.shields.io/badge/MIT-green)

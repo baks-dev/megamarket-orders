@@ -33,6 +33,16 @@
       "BaksDev\\Megamarket\\Orders\\": ""
     }
   },
+  "scripts": {
+    "auto-scripts": {
+      "baks:users-profile-type:megamarket": "symfony-cmd",
+      "baks:payment:megamarket": "symfony-cmd",
+      "baks:delivery:megamarket": "symfony-cmd"
+    },
+    "post-install-cmd": [
+      "@auto-scripts"
+    ]
+  },
   "config": {
     "sort-packages": true,
     "allow-plugins": {

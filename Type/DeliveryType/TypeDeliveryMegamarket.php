@@ -31,7 +31,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.delivery.type')]
 final class TypeDeliveryMegamarket implements TypeDeliveryInterface
 {
-
     /** Megamarket */
     public const TYPE = '8e0442be-3363-74fd-b2fd-e08249fbd2a3';
 

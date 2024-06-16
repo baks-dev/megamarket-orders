@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Commands\Upgrade;
 
-
 use BaksDev\Core\Type\Field\InputField;
 use BaksDev\Delivery\Entity\Delivery;
 use BaksDev\Delivery\Repository\ExistTypeDelivery\ExistTypeDeliveryInterface;
@@ -63,8 +62,7 @@ class UpgradeDeliveryTypeMegamarketCommand extends Command
         ExistTypeDeliveryInterface $existTypeDelivery,
         TranslatorInterface $translator,
         DeliveryHandler $deliveryHandler
-    )
-    {
+    ) {
         parent::__construct();
 
         $this->translator = $translator;
