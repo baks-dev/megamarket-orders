@@ -22,6 +22,20 @@ php bin/console baks:payment:megamarket
 php bin/console baks:delivery:megamarket
 ```
 
+#### Настройка интеграции по API Megamarket
+
+* Метод создания отправления (order/new):
+
+``` text 
+https://you.domain/megamarket/order/new
+```
+
+* Метод отмены лотов со стороны Megamarket (order/cancel):
+
+``` text
+https://you.domain/megamarket/order/cancel
+```
+
 ## Дополнительно
 
 Установка конфигурации и файловых ресурсов:
