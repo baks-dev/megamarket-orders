@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Controller\Megamarket;
 
 use BaksDev\Core\Controller\AbstractController;
+use Psr\Log\LoggerInterface;
 use stdClass;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,15 +42,15 @@ final class NewController extends AbstractController
      */
     #[Route('/megamarket/order/new', name: 'megamarket.order.new', methods: ['GET', 'POST'])]
     public function index(
-        Request $request
-    ): Response
-    {
+        Request $request,
+        LoggerInterface $megamarketOrdersLogger
+    ): Response {
+
+        $megamarketOrdersLogger->debug($request->getContent());
 
         $data = json_decode($request->getContent());
 
-
         return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 1]);
-
     }
 
     public function test()
