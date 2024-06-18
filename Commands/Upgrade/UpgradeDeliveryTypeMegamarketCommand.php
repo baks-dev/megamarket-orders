@@ -106,13 +106,12 @@ class UpgradeDeliveryTypeMegamarketCommand extends Command
              */
             foreach($DeliveryTransDTO as $DeliveryTrans)
             {
-                $name = $this->translator->trans('yandex.name', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('yandex.desc', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('megamarket.name', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('megamarket.desc', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
 
                 $DeliveryTrans->setName($name);
                 $DeliveryTrans->setDescription($desc);
             }
-
 
             /**
              * Создаем пользовательское поле с адресом доставки
@@ -124,8 +123,8 @@ class UpgradeDeliveryTypeMegamarketCommand extends Command
             /** @var DeliveryFieldTransDTO $DeliveryFieldTrans */
             foreach($DeliveryFieldDTO->getTranslate() as $DeliveryFieldTrans)
             {
-                $name = $this->translator->trans('yandex.address.name', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('yandex.address.desc', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('megamarket.address.name', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('megamarket.address.desc', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
 
                 $DeliveryFieldTrans->setName($name);
                 $DeliveryFieldTrans->setDescription($desc);

@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Commands\Upgrade;
 
-
 use BaksDev\Core\Type\Field\InputField;
 use BaksDev\Users\Profile\TypeProfile\Entity\TypeProfile;
 use BaksDev\Users\Profile\TypeProfile\Repository\ExistTypeProfile\ExistTypeProfileInterface;
@@ -61,8 +60,7 @@ class UpgradeProfileTypeMegamarketCommand extends Command
         ExistTypeProfileInterface $existTypeProfile,
         TranslatorInterface $translator,
         TypeProfileHandler $profileHandler,
-    )
-    {
+    ) {
         parent::__construct();
 
         $this->existTypeProfile = $existTypeProfile;
@@ -96,8 +94,8 @@ class UpgradeProfileTypeMegamarketCommand extends Command
              */
             foreach($TypeProfileTranslateDTO as $ProfileTrans)
             {
-                $name = $this->translator->trans('yandex.name', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('yandex.desc', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('megamarket.name', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('megamarket.desc', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
 
                 $ProfileTrans->setName($name);
                 $ProfileTrans->setDescription($desc);
@@ -112,8 +110,8 @@ class UpgradeProfileTypeMegamarketCommand extends Command
             /** @var SectionTransDTO $SectionTrans */
             foreach($SectionDTO->getTranslate() as $SectionTrans)
             {
-                $name = $this->translator->trans('yandex.section.contact.name', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('yandex.section.contact.desc', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('megamarket.section.contact.name', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('megamarket.section.contact.desc', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
 
                 $SectionTrans->setName($name);
                 $SectionTrans->setDescription($desc);
@@ -137,8 +135,8 @@ class UpgradeProfileTypeMegamarketCommand extends Command
                 /** @var SectionFieldTransDTO $SectionFieldTrans */
                 foreach($SectionFieldDTO->getTranslate() as $SectionFieldTrans)
                 {
-                    $name = $this->translator->trans('yandex.section.contact.field.'.$field.'.name', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
-                    $desc = $this->translator->trans('yandex.section.contact.field.'.$field.'.desc', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
+                    $name = $this->translator->trans('megamarket.section.contact.field.'.$field.'.name', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
+                    $desc = $this->translator->trans('megamarket.section.contact.field.'.$field.'.desc', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
 
                     $SectionFieldTrans->setName($name);
                     $SectionFieldTrans->setDescription($desc);
@@ -149,7 +147,6 @@ class UpgradeProfileTypeMegamarketCommand extends Command
             }
 
             $TypeProfileDTO->addSection($SectionDTO);
-
 
 
             $handle = $this->profileHandler->handle($TypeProfileDTO);
@@ -169,5 +166,4 @@ class UpgradeProfileTypeMegamarketCommand extends Command
     {
         return 99;
     }
-
 }

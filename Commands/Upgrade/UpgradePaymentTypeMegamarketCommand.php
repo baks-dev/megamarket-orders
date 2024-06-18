@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Commands\Upgrade;
 
-
 use BaksDev\Payment\Entity\Payment;
 use BaksDev\Payment\Repository\ExistTypePayment\ExistTypePaymentInterface;
 use BaksDev\Payment\Type\Id\Choice\TypePaymentCache;
@@ -49,7 +48,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.project.upgrade')]
 class UpgradePaymentTypeMegamarketCommand extends Command
 {
-
     private TranslatorInterface $translator;
     private PaymentHandler $paymentHandler;
     private ExistTypePaymentInterface $existTypePayment;
@@ -58,8 +56,7 @@ class UpgradePaymentTypeMegamarketCommand extends Command
         ExistTypePaymentInterface $existTypePayment,
         PaymentHandler $paymentHandler,
         TranslatorInterface $translator,
-    )
-    {
+    ) {
         parent::__construct();
 
         $this->translator = $translator;
@@ -92,8 +89,8 @@ class UpgradePaymentTypeMegamarketCommand extends Command
              */
             foreach($PaymentTransDTO as $PaymentTrans)
             {
-                $name = $this->translator->trans('yandex.name', domain: 'payment.type', locale: $PaymentTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('yandex.desc', domain: 'payment.type', locale: $PaymentTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('megamarket.name', domain: 'payment.type', locale: $PaymentTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('megamarket.desc', domain: 'payment.type', locale: $PaymentTrans->getLocal()->getLocalValue());
 
                 $PaymentTrans->setName($name);
                 $PaymentTrans->setDescription($desc);
@@ -116,5 +113,4 @@ class UpgradePaymentTypeMegamarketCommand extends Command
     {
         return 99;
     }
-
 }
