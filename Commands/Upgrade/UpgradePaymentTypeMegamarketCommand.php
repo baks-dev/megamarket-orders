@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Commands\Upgrade;
 
+use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileMegamarket;
 use BaksDev\Payment\Entity\Payment;
 use BaksDev\Payment\Repository\ExistTypePayment\ExistTypePaymentInterface;
 use BaksDev\Payment\Type\Id\Choice\TypePaymentCache;
@@ -33,6 +34,8 @@ use BaksDev\Payment\UseCase\Admin\NewEdit\PaymentDTO;
 use BaksDev\Payment\UseCase\Admin\NewEdit\PaymentHandler;
 use BaksDev\Payment\UseCase\Admin\NewEdit\Trans\PaymentTransDTO;
 use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentMegamarket;
+use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
+use BaksDev\Yandex\Market\Orders\Type\ProfileType\TypeProfileYandexMarket;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -78,6 +81,7 @@ class UpgradePaymentTypeMegamarketCommand extends Command
             $io->text('Добавляем способ оплаты Megamarket');
 
             $PaymentDTO = new PaymentDTO($PaymentUid);
+            $PaymentDTO->setType(new TypeProfileUid(TypeProfileMegamarket::class));
             $PaymentDTO->setSort(TypePaymentCache::priority());
 
             $PaymentTransDTO = $PaymentDTO->getTranslate();
