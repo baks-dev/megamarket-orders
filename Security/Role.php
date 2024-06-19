@@ -29,7 +29,6 @@ use BaksDev\Megamarket\Security\MenuGroupMegamarket;
 use BaksDev\Menu\Admin\Command\Upgrade\MenuAdminInterface;
 use BaksDev\Menu\Admin\Type\SectionGroup\Group\Collection\MenuAdminSectionGroupCollectionInterface;
 use BaksDev\Users\Profile\Group\Security\RoleInterface;
-use BaksDev\Wildberries\Security\MenuGroupWildberries;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.security.role')]
