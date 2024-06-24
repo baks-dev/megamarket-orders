@@ -52,20 +52,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.project.upgrade')]
 class UpgradeProfileTypeMegamarketCommand extends Command
 {
-    private ExistTypeProfileInterface $existTypeProfile;
-    private TranslatorInterface $translator;
-    private TypeProfileHandler $profileHandler;
-
     public function __construct(
-        ExistTypeProfileInterface $existTypeProfile,
-        TranslatorInterface $translator,
-        TypeProfileHandler $profileHandler,
+        private readonly ExistTypeProfileInterface $existTypeProfile,
+        private readonly TranslatorInterface $translator,
+        private readonly TypeProfileHandler $profileHandler,
     ) {
         parent::__construct();
-
-        $this->existTypeProfile = $existTypeProfile;
-        $this->translator = $translator;
-        $this->profileHandler = $profileHandler;
     }
 
     /** Добавляет тип профиля Megamarket  */

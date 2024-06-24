@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Commands\Upgrade;
 
+use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentMegamarket;
 use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileMegamarket;
 use BaksDev\Payment\Entity\Payment;
 use BaksDev\Payment\Repository\ExistTypePayment\ExistTypePaymentInterface;
@@ -33,9 +34,7 @@ use BaksDev\Payment\Type\Id\PaymentUid;
 use BaksDev\Payment\UseCase\Admin\NewEdit\PaymentDTO;
 use BaksDev\Payment\UseCase\Admin\NewEdit\PaymentHandler;
 use BaksDev\Payment\UseCase\Admin\NewEdit\Trans\PaymentTransDTO;
-use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentMegamarket;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
-use BaksDev\Yandex\Market\Orders\Type\ProfileType\TypeProfileYandexMarket;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,20 +50,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.project.upgrade')]
 class UpgradePaymentTypeMegamarketCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private PaymentHandler $paymentHandler;
-    private ExistTypePaymentInterface $existTypePayment;
-
     public function __construct(
-        ExistTypePaymentInterface $existTypePayment,
-        PaymentHandler $paymentHandler,
-        TranslatorInterface $translator,
+        private readonly ExistTypePaymentInterface $existTypePayment,
+        private readonly PaymentHandler $paymentHandler,
+        private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
-
-        $this->translator = $translator;
-        $this->existTypePayment = $existTypePayment;
-        $this->paymentHandler = $paymentHandler;
     }
 
     /** Добавляет способ оплаты Megamarket  */

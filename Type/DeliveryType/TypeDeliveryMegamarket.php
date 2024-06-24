@@ -48,7 +48,7 @@ final class TypeDeliveryMegamarket implements TypeDeliveryInterface
     /** Сортировка */
     public static function priority(): int
     {
-        return 800;
+        return 430;
     }
 
     public static function equals(mixed $uid): bool

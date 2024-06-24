@@ -26,15 +26,9 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Messenger\NewOrders;
 
 use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
 use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
 use BaksDev\Megamarket\Repository\ProfileByCompany\ProfileByCompanyInterface;
-use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface;
-use BaksDev\Yandex\Market\Orders\Api\YandexMarketNewOrdersRequest;
-use BaksDev\Yandex\Market\Orders\Messenger\NewOrders\NewYandexOrdersMessage;
-use BaksDev\Yandex\Market\Orders\UseCase\New\YandexMarketOrderDTO;
-use BaksDev\Yandex\Market\Orders\UseCase\New\YandexMarketOrderHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

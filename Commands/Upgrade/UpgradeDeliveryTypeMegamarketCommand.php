@@ -54,20 +54,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.project.upgrade')]
 class UpgradeDeliveryTypeMegamarketCommand extends Command
 {
-    private ExistTypeDeliveryInterface $existTypeDelivery;
-    private TranslatorInterface $translator;
-    private DeliveryHandler $deliveryHandler;
-
     public function __construct(
-        ExistTypeDeliveryInterface $existTypeDelivery,
-        TranslatorInterface $translator,
-        DeliveryHandler $deliveryHandler
+        private readonly ExistTypeDeliveryInterface $existTypeDelivery,
+        private readonly TranslatorInterface $translator,
+        private readonly DeliveryHandler $deliveryHandler
     ) {
         parent::__construct();
-
-        $this->translator = $translator;
-        $this->existTypeDelivery = $existTypeDelivery;
-        $this->deliveryHandler = $deliveryHandler;
     }
 
     /** Добавляет доставку Megamarket  */

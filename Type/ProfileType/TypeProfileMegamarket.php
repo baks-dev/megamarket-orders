@@ -47,7 +47,7 @@ final class TypeProfileMegamarket implements TypeProfileInterface
     /** Сортировка */
     public static function priority(): int
     {
-        return 300;
+        return 430;
     }
 
     public static function equals(mixed $uid): bool
