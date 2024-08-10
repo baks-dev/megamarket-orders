@@ -1,5 +1,9 @@
 megamarket:
-  name: 'Megamarket'
-  desc: 'Оплата Megamarket'
+  fbs:
+    name: 'Megamarket'
+    desc: 'Оплата FBS Megamarket'
 
+  dbs:
+    name: 'DBS Megamarket'
+    desc: 'Оплата DBS Megamarket'
 

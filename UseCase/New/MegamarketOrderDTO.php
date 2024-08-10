@@ -27,13 +27,19 @@ namespace BaksDev\Megamarket\Orders\UseCase\New;
 
 use BaksDev\Core\Type\Gps\GpsLatitude;
 use BaksDev\Core\Type\Gps\GpsLongitude;
+use BaksDev\Delivery\Type\Id\DeliveryUid;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryDbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentDbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileDbsMegamarket;
 use BaksDev\Orders\Order\Entity\Event\OrderEventInterface;
 use BaksDev\Orders\Order\Type\Event\OrderEventUid;
-use BaksDev\Reference\Currency\Type\Currency;
+use BaksDev\Payment\Type\Id\PaymentUid;
 use BaksDev\Reference\Money\Type\Money;
+use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use stdClass;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see OrderEvent */
@@ -43,10 +49,10 @@ final class MegamarketOrderDTO implements OrderEventInterface
     #[Assert\Uuid]
     private ?OrderEventUid $id = null;
 
-    /** Идентификатор заказа YandexMarket */
+    /** Идентификатор отправления Мегамаркета */
     private string $number;
 
-    /** Дата заказа */
+    /** Дата создания отправления */
     #[Assert\NotBlank]
     private DateTimeImmutable $created;
 
@@ -62,52 +68,128 @@ final class MegamarketOrderDTO implements OrderEventInterface
     /** Ответственный */
     private ?UserProfileUid $profile = null;
 
-    public function __construct(array $order)
-    {
+    /** Комментарий к заказу */
+    private ?string $comment = null;
 
-        $this->number = (string) $order['shipmentId'];
+    /** Информация о покупателе */
+    private ?stdClass $customer = null;
 
-        $this->created = new DateTimeImmutable($order['creationDate']);
+
+    public function __construct() {
 
         $this->product = new ArrayCollection();
         $this->usr = new User\OrderUserDTO();
+    }
 
-        /** Крайняя дата доставки */
-        $deliveryDate = new DateTimeImmutable($order['shippingTimeLimit']);
+    public function construct(stdClass $order)
+    {
+
+        //$data = $order->data;
+        //$shipments = current($data->shipments);
+
+        //$this->number = (string) 'M-'.$shipments->shipmentId; // Номер заказа
+        //$this->created = new DateTimeImmutable($shipments->shipmentDate); // Дата заказа
+
+
+        //$this->product = new ArrayCollection();
+        //$this->usr = new User\OrderUserDTO();
 
         $OrderDeliveryDTO = $this->usr->getDelivery();
+        $OrderPaymentDTO = $this->usr->getPayment();
+        $OrderProfileDTO = $this->usr->getUserProfile();
+
+        /** Дата доставки */
+        $delivery = $shipments->handover;
+        $deliveryDate = new DateTimeImmutable($delivery->deliveryInterval->dateFrom);
         $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
 
 
-        //$address = $order['delivery']['address'];
+        $address = $shipments->customer->address;
 
         /** Геолокация клиента */
-        //$OrderDeliveryDTO->setLatitude(new GpsLatitude($address['gps']['latitude']));
-        //$OrderDeliveryDTO->setLongitude(new GpsLongitude($address['gps']['longitude']));
-
-        /** Адрес доставки клиента */
-        $OrderDeliveryDTO->setAddress($order['customerAddress']);
+        $OrderDeliveryDTO->setLatitude(new GpsLatitude($address->geo->lat));
+        $OrderDeliveryDTO->setLongitude(new GpsLongitude($address->geo->lon));
+        $OrderDeliveryDTO->setAddress($address->source);
 
 
-        /** Продукция */
-        foreach($order['items'] as $item)
+        /** Доставка DBS */
+        if($delivery->serviceScheme === 'DELIVERY_BY_MERCHANT')
         {
-            $NewOrderProductDTO = new Products\NewOrderProductDTO($item['offerId']);
+            /** Тип профиля DBS Megamarket */
+            $Profile = new TypeProfileUid(TypeProfileDbsMegamarket::class);
+            $OrderProfileDTO?->setType($Profile);
 
-            $NewOrderPriceDTO = $NewOrderProductDTO->getPrice();
+            /** Способ доставки Магазином (DBS Megamarket) */
+            $Delivery = new DeliveryUid(TypeDeliveryDbsMegamarket::class);
+            $OrderDeliveryDTO->setDelivery($Delivery);
 
-            $Money = new Money($item['price']); // Стоимость товара в валюте магазина до применения скидок.
-            $Currency = new Currency(); // Валюта по умолчанию
-
-            $NewOrderPriceDTO->setPrice($Money);
-            $NewOrderPriceDTO->setCurrency($Currency);
-            $NewOrderPriceDTO->setTotal($item['quantity']);
-
-            $this->addProduct($NewOrderProductDTO);
-
+            /** Способ оплаты DBS Megamarket  */
+            $Payment = new PaymentUid(TypePaymentDbsMegamarket::class);
+            $OrderPaymentDTO->setPayment($Payment);
         }
 
+        foreach($address->access as $key => $access)
+        {
+            if(empty($access))
+            {
+                continue;
+            }
+
+            $deliveryComment[] = match ($key)
+            {
+                'detachedHouse' => 'частный дом',
+                'entrance' => 'вход '.$access,
+                'intercom' => 'домофон '.$access,
+                'cargoElevator' => 'гр. лифт',
+                'floor' => 'этаж '.$access,
+                'apartment' => 'кв. '.$access,
+                default => $access,
+            };
+        }
+
+        /** Комментарий покупателя */
+        $this->comment = implode(', ', $deliveryComment);
+
+
+        /** Информация о покупателе (для заполнения свойств профиля) */
+        $this->customer = $shipments->customer;
+
+
+        $products = [];
+
+        /** Продукция */
+        foreach($shipments->items as $item)
+        {
+            /** Если доставка - присваиваем стоимость */
+            if($item->offerId === 'delivery')
+            {
+                $OrderDeliveryDTO
+                    ->getPrice()
+                    ->setPrice(new Money($item->finalPrice));
+                continue;
+            }
+
+            if(!isset($products[$item->offerId]))
+            {
+                /* Создаем объект и присваиваем стоимость */
+                $NewOrderProductDTO = new Products\NewOrderProductDTO($item->offerId);
+                $NewOrderProductDTO->getPrice()->setPrice(new Money($item->finalPrice));
+                $this->addProduct($NewOrderProductDTO);
+
+                $products[$item->offerId] = $NewOrderProductDTO;
+            }
+            else
+            {
+                $NewOrderProductDTO = $products[$item->offerId];
+            }
+
+            /** Увеличиваем количество */
+            $NewOrderProductDTO->getPrice()->addTotal($item->quantity);
+        }
     }
+
+
+
 
 
     /** @see OrderEvent */
@@ -124,6 +206,13 @@ final class MegamarketOrderDTO implements OrderEventInterface
         return $this->number;
     }
 
+    public function setNumber(string $number): self
+    {
+        $this->number = $number;
+        return $this;
+    }
+
+
 
     /** Коллекция продукции в заказе */
 
@@ -139,8 +228,7 @@ final class MegamarketOrderDTO implements OrderEventInterface
 
     public function addProduct(Products\NewOrderProductDTO $product): void
     {
-        $filter = $this->product->filter(function(Products\NewOrderProductDTO $element) use ($product)
-        {
+        $filter = $this->product->filter(function (Products\NewOrderProductDTO $element) use ($product) {
             return $element->getArticle() === $product->getArticle();
         });
 
@@ -162,6 +250,49 @@ final class MegamarketOrderDTO implements OrderEventInterface
     {
         return $this->usr;
     }
+
+    /**
+     * Buyer
+     */
+    public function getCustomer(): ?stdClass
+    {
+
+        return $this->customer;
+    }
+
+
+
+    /**
+     * Created
+     */
+    public function getCreated(): DateTimeImmutable
+    {
+        return $this->created;
+    }
+
+    public function setCreated(DateTimeImmutable $created): self
+    {
+        $this->created = $created;
+        return $this;
+    }
+
+
+
+    /**
+     * Comment
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+
+
 
 
 

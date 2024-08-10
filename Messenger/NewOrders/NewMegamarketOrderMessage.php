@@ -25,37 +25,30 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Messenger\NewOrders;
 
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-final class NewMegamarketOrderMessage
+final readonly class NewMegamarketOrderMessage
 {
-
     /** Идентификатор магазина */
-    private int $company;
+    private UserProfileUid $profile;
 
     /** Идентификатор заказа */
     private string $shipment;
 
-    public function __construct(int|string $shipment, int $company) {
-
-        $this->shipment = (string) $shipment;
-        $this->company = $company;
-    }
-
-    /**
-     * Company
-     */
-    public function getCompany(): int
+    public function __construct(int|string $shipment, UserProfileUid $profile)
     {
-        return $this->company;
+        $this->shipment = (string) $shipment;
+        $this->profile = $profile;
     }
 
-    /**
-     * Id
-     */
     public function getShipment(): string
     {
         return $this->shipment;
+    }
+
+    public function getProfile(): UserProfileUid
+    {
+        return $this->profile;
     }
 }

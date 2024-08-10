@@ -1,3 +1,8 @@
 megamarket:
-  name: 'Megamarket'
-  desc: 'Оплата Megamarket'
+  fbs:
+    name: 'Megamarket'
+    desc: 'Payment for FBS Megamarket'
+
+  dbs:
+    name: 'DBS Megamarket'
+    desc: 'Payment for DBS Megamarket'

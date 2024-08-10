@@ -1,15 +1,41 @@
 megamarket:
-  name: 'Megamarket'
-  desc: 'Пользователь Megamarket'
 
+  fbs:
 
-  section:
-    contact:
-      name: 'Контактные данные'
-      desc: 'Данные для связи менеджерами магазина с покупателем.'
+    name: 'Megamarket'
+    desc: 'Пользователь Megamarket'
 
-      field:
+    section:
+      contact:
+        name: 'Контактные данные'
+        desc: 'Данные для связи менеджерами магазина с покупателем.'
 
-        name:
-          name: 'Контактное лицо'
-          desc: 'ФИО пользователя'
+        field:
+
+          name:
+            name: 'Контактное лицо'
+            desc: 'ФИО пользователя'
+
+  dbs:
+
+    name: 'DBS Megamarket'
+    desc: 'Пользователь DBS Megamarket'
+
+    section:
+      contact:
+        name: 'Контактные данные'
+        desc: 'Данные для связи менеджерами магазина с покупателем.'
+
+        field:
+
+          name:
+            name: 'Получатель'
+            desc: 'ФИО пользователя'
+
+          email:
+            name: 'Контактный E-mail'
+            desc: 'Укажите для отправки уведомлений'
+
+          phone:
+            name: 'Контактный телефон'
+            desc: 'Контактный телефон для связи'

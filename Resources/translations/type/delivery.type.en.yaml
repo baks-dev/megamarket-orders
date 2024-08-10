@@ -1,8 +1,17 @@
 megamarket:
-  name: 'Megamarket'
-  desc: 'Megamarket Delivery'
+  fbs:
+    name: 'Yandex warehouse'
+    desc: 'Megamarket courier delivery'
+
+    address:
+      name: 'Megamarket pick-up point address'
+      desc: 'Address of the Megamarket order pick-up point selected by the client'
 
 
-  address:
-    name: 'Client address'
-    desc: 'Address of delivery of the order to the client'
+  dbs:
+    name: 'Delivery to Yandex client'
+    desc: 'Delivery to Megamarket client'
+
+    address:
+      name: 'Client address'
+      desc: 'Delivery address of the order to the Megamarket client'

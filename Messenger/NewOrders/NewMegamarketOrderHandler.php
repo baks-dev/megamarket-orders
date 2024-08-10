@@ -25,113 +25,279 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Messenger\NewOrders;
 
+use BaksDev\Core\Type\Field\InputField;
+use BaksDev\Delivery\Repository\CurrentDeliveryEvent\CurrentDeliveryEventInterface;
+use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryDbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryFbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentDbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentFbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileDbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileFbsMegamarket;
+use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
 use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
-use BaksDev\Megamarket\Repository\ProfileByCompany\ProfileByCompanyInterface;
+use BaksDev\Megamarket\Orders\UseCase\New\Products\NewOrderProductDTO;
+use BaksDev\Megamarket\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
+use BaksDev\Megamarket\Orders\UseCase\New\User\UserProfile\Value\ValueDTO;
+use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface;
+use BaksDev\Orders\Order\Repository\FieldByDeliveryChoice\FieldByDeliveryChoiceInterface;
+use BaksDev\Payment\Type\Id\Choice\TypePaymentCache;
+use BaksDev\Payment\Type\Id\PaymentUid;
+use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByArticleInterface;
+use BaksDev\Reference\Money\Type\Money;
+use BaksDev\Users\Address\Services\GeocodeAddressParser;
+use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
+use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormDTO;
+use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormInterface;
+use DateTimeImmutable;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final class NewMegamarketOrderHandler
 {
-
     private LoggerInterface $logger;
-    private MegamarketOrderHandler $megamarketOrderHandler;
-    private ExistsOrderNumberInterface $existsOrderNumber;
-    private MegamarketOrderRequest $megamarketOrderRequest;
-    private ProfileByCompanyInterface $profileByCompany;
-
 
     public function __construct(
         LoggerInterface $megamarketOrdersLogger,
-        ExistsOrderNumberInterface $existsOrderNumber,
-        MegamarketOrderHandler $megamarketOrderHandler,
-        MegamarketOrderRequest $megamarketOrderRequest,
-        ProfileByCompanyInterface $profileByCompany
-
-    )
-    {
+        private readonly ExistsOrderNumberInterface $existsOrderNumber,
+        private readonly MegamarketOrderHandler $megamarketOrderHandler,
+        private readonly MegamarketOrderRequest $megamarketOrderRequest,
+        private readonly FieldValueFormInterface $fieldValue,
+        private readonly GeocodeAddressParser $geocodeAddressParser,
+        private readonly FieldByDeliveryChoiceInterface $deliveryFields,
+        private readonly CurrentDeliveryEventInterface $currentDeliveryEvent,
+        private readonly ProductConstByArticleInterface $productConstByArticle,
+    ) {
         $this->logger = $megamarketOrdersLogger;
-        $this->megamarketOrderHandler = $megamarketOrderHandler;
-        $this->existsOrderNumber = $existsOrderNumber;
-        $this->megamarketOrderRequest = $megamarketOrderRequest;
-        $this->profileByCompany = $profileByCompany;
+
     }
 
-    public function __invoke(NewMegamarketOrderMessage $message): void
+    public function __invoke(NewMegamarketOrderMessage $message): bool
     {
         /** Делаем проверку, что заказа с таким номером не существует */
-        if($this->existsOrderNumber->isExists($message->getShipment()))
+        if($this->existsOrderNumber->isExists('M-'.$message->getShipment()))
         {
-            return;
-        }
-
-        /** Получаем активный профиль пользователя по идентификатору компании */
-        $UserProfileUid = $this->profileByCompany->find($message->getCompany());
-
-        if(!$UserProfileUid)
-        {
-            return;
+            $this->logger->info(sprintf('Заказ Megamarket #%s уже добавлен в систему', $message->getShipment()), [__FILE__.':'.__LINE__]);
+            return false;
         }
 
         /** Получаем информацию о заказе */
-        $MegamarketOrderDTO = $this->megamarketOrderRequest
-            ->profile($UserProfileUid)
+        $MegamarketOrderRequest = $this->megamarketOrderRequest
+            ->profile($message->getProfile())
             ->find($message->getShipment());
 
 
-        if(false === $MegamarketOrderDTO->valid())
+        if($MegamarketOrderRequest === false)
         {
-            return;
+            $this->logger->critical(sprintf('Ошибка при добавлении заказа Megamarket #%s', $message->getShipment()), [__FILE__.':'.__LINE__]);
+            return false;
         }
 
 
-        dd($MegamarketOrderDTO);
-
-        //            /**
-        //             * Создаем системный заказ
-        //             */
-        //            $handle = $this->yandexMarketOrderHandler->handle($order);
+        $MegamarketOrderDTO = new MegamarketOrderDTO();
+        $MegamarketOrderDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер
+        $MegamarketOrderDTO->setCreated(new DateTimeImmutable($MegamarketOrderRequest['creationDate'])); // дата создания заказа
 
 
-        //        /** @var YandexMarketOrderDTO $order */
-        //        foreach($orders as $order)
-        //        {
-        //            if($this->existsOrderNumber->isExists($order->getNumber()))
-        //            {
-        //                continue;
-        //            }
-        //
-        //            /**
-        //             * Создаем системный заказ
-        //             */
-        //            $handle = $this->yandexMarketOrderHandler->handle($order);
-        //
-        //            if($handle instanceof Order)
-        //            {
-        //                $this->logger->info(
-        //                    sprintf('Добавили новый заказ %s', $order->getNumber()),
-        //                    [
-        //                        __FILE__.':'.__LINE__,
-        //                        'attr' => (string) $message->getProfile()->getAttr(),
-        //                        'profile' => (string) $message->getProfile(),
-        //                    ]
-        //                );
-        //
-        //                continue;
-        //            }
-        //
-        //
-        //            $this->logger->critical(
-        //                sprintf('%s: Ошибка при добавлении заказа %s', $handle, $order->getNumber()),
-        //                [
-        //                    __FILE__.':'.__LINE__,
-        //                    'attr' => (string) $message->getProfile()->getAttr(),
-        //                    'profile' => (string) $message->getProfile(),
-        //                ]
-        //            );
-        //        }
+        $OrderDeliveryDTO = $MegamarketOrderDTO->getUsr()->getDelivery();
+        $OrderDeliveryDTO->setDeliveryDate(new DateTimeImmutable($MegamarketOrderRequest['deliveryDateFrom']));
+        $OrderDeliveryDTO->setAddress($MegamarketOrderRequest['customerAddress']);
+
+
+        $OrderPaymentDTO = $MegamarketOrderDTO->getUsr()->getPayment();
+        $OrderProfileDTO = $MegamarketOrderDTO->getUsr()->getUserProfile();
+
+
+        /** Доставка DBS */
+        if($MegamarketOrderRequest['serviceScheme'] === 'DELIVERY_BY_MERCHANT')
+        {
+            /** Тип профиля DBS Megamarket */
+            $Profile = new TypeProfileUid(TypeProfileDbsMegamarket::class);
+            $OrderProfileDTO?->setType($Profile);
+
+            /** Способ доставки Магазином (DBS Megamarket) */
+            $Delivery = new DeliveryUid(TypeDeliveryDbsMegamarket::class);
+            $OrderDeliveryDTO->setDelivery($Delivery);
+
+            if($MegamarketOrderRequest['depositedAmount'] === 0)
+            {
+                /** Оплата при получении  */
+                $Payment = new PaymentUid(TypePaymentCache::class);
+            }
+            else
+            {
+                /** Способ оплаты DBS Megamarket */
+                $Payment = new PaymentUid(TypePaymentDbsMegamarket::class);
+            }
+
+
+            $email = $MegamarketOrderRequest['customer']['email'];
+            $phone = $MegamarketOrderRequest['customer']['phone'];
+
+            $OrderPaymentDTO->setPayment($Payment);
+
+        }
+        else
+        {
+            /** Тип профиля DBS Megamarket */
+            $Profile = new TypeProfileUid(TypeProfileFbsMegamarket::class);
+            $OrderProfileDTO?->setType($Profile);
+
+            /** Способ доставки Магазином (DBS Megamarket) */
+            $Delivery = new DeliveryUid(TypeDeliveryFbsMegamarket::class);
+            $OrderDeliveryDTO->setDelivery($Delivery);
+
+            /** Способ оплаты DBS Megamarket  */
+            $Payment = new PaymentUid(TypePaymentFbsMegamarket::class);
+            $OrderPaymentDTO->setPayment($Payment);
+
+            $email = $MegamarketOrderRequest['customer']['email'];
+            $phone = $MegamarketOrderRequest['customer']['phone'];
+        }
+
+
+        $MegamarketOrderDTO->setComment($MegamarketOrderRequest['customer']['comment']);
+
+        if($OrderProfileDTO)
+        {
+            /** Определяем свойства клиента при доставке DBS */
+            $profileFields = $this->fieldValue->get($OrderProfileDTO->getType());
+
+            /** @var FieldValueFormDTO $profileField */
+            foreach($profileFields as $profileField)
+            {
+                if(!empty($email) && $profileField->getType()->getType() === 'account_email')
+                {
+                    $UserProfileValueDTO = new ValueDTO();
+                    $UserProfileValueDTO->setField($profileField->getField());
+                    $UserProfileValueDTO->setValue($MegamarketOrderRequest['customer']['email']);
+                    $OrderProfileDTO?->addValue($UserProfileValueDTO);
+                    continue;
+                }
+
+                if($profileField->getType()->getType() === 'contact_field')
+                {
+                    $UserProfileValueDTO = new ValueDTO();
+                    $UserProfileValueDTO->setField($profileField->getField());
+                    $UserProfileValueDTO->setValue($MegamarketOrderRequest['customerFullName']);
+                    $OrderProfileDTO?->addValue($UserProfileValueDTO);
+
+                    continue;
+                }
+
+                if(!empty($phone) && $profileField->getType()->getType() === 'phone_field')
+                {
+                    $UserProfileValueDTO = new ValueDTO();
+                    $UserProfileValueDTO->setField($profileField->getField());
+                    $UserProfileValueDTO->setValue($MegamarketOrderRequest['customer']['phone']);
+                    $OrderProfileDTO?->addValue($UserProfileValueDTO);
+
+                    continue;
+                }
+            }
+        }
+
+        /** Определяем геолокацию */
+        $GeocodeAddress = $this
+            ->geocodeAddressParser
+            ->getGeocode($OrderDeliveryDTO->getAddress());
+
+
+        if(!empty($GeocodeAddress))
+        {
+            $OrderDeliveryDTO->setAddress($GeocodeAddress->getAddress());
+            $OrderDeliveryDTO->setLatitude($GeocodeAddress->getLatitude());
+            $OrderDeliveryDTO->setLongitude($GeocodeAddress->getLongitude());
+        }
+
+        /**
+         * Определяем свойства доставки и присваиваем адрес
+         */
+
+        $fields = $this->deliveryFields->fetchDeliveryFields($OrderDeliveryDTO->getDelivery());
+
+        $address_field = array_filter($fields, function ($v) {
+            /** @var InputField $InputField */
+            return $v->getType()->getType() === 'address_field';
+        });
+
+        $address_field = current($address_field);
+
+        if($address_field)
+        {
+            $OrderDeliveryFieldDTO = new OrderDeliveryFieldDTO();
+            $OrderDeliveryFieldDTO->setField($address_field);
+            $OrderDeliveryFieldDTO->setValue($OrderDeliveryDTO->getAddress());
+            $OrderDeliveryDTO->addField($OrderDeliveryFieldDTO);
+        }
+
+        /** Присваиваем активное событие доставки */
+        $DeliveryEvent = $this->currentDeliveryEvent->get($OrderDeliveryDTO->getDelivery());
+        $OrderDeliveryDTO->setEvent($DeliveryEvent?->getId());
+
+        $products = [];
+
+        /** Продукция */
+        foreach($MegamarketOrderRequest['items'] as $product)
+        {
+            /** Если доставка - присваиваем стоимость */
+            if($product['offerId'] === 'delivery')
+            {
+                $OrderDeliveryDTO
+                    ->getPrice()
+                    ->setPrice(new Money($product['price']));
+                continue;
+            }
+
+            if(!isset($products[$product['offerId']]))
+            {
+                $ProductData = $this->productConstByArticle->find($product['offerId']);
+
+                if(!$ProductData)
+                {
+                    $error = sprintf('Артикул товара %s не найден', $product->getArticle());
+                    throw new InvalidArgumentException($error);
+                }
+
+                /* Создаем объект и присваиваем стоимость */
+                $NewOrderProductDTO = new NewOrderProductDTO($product['offerId']);
+                $NewOrderProductDTO->getPrice()->setPrice(new Money($product['price']));
+                $NewOrderProductDTO
+                    ->setProduct($ProductData->getEvent())
+                    ->setOffer($ProductData->getOffer())
+                    ->setVariation($ProductData->getVariation())
+                    ->setModification($ProductData->getModification());
+
+                $MegamarketOrderDTO->addProduct($NewOrderProductDTO);
+
+                $products[$product['offerId']] = $NewOrderProductDTO;
+            }
+            else
+            {
+                $NewOrderProductDTO = $products[$product['offerId']];
+            }
+
+            /** Увеличиваем количество */
+            $NewOrderProductDTO->getPrice()->addTotal($product['quantity']);
+        }
+
+        $Order = $this->megamarketOrderHandler->handle($MegamarketOrderDTO);
+
+        if($Order instanceof Order)
+        {
+            $this->logger->info(sprintf('Добавили новый заказа Megamarket #%s', $message->getShipment()));
+            return true;
+        }
+
+        $this->logger->critical(
+            sprintf('%s: Ошибка при добавлении заказа Megamarket #%s', $Order, $message->getShipment()),
+            [__FILE__.':'.__LINE__]
+        );
+        return false;
+
     }
-
 }

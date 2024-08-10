@@ -26,6 +26,14 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Controller\Megamarket;
 
 use BaksDev\Core\Controller\AbstractController;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Core\Type\UidType\ParamConverter;
+use BaksDev\Megamarket\Orders\Messenger\NewOrders\NewMegamarketOrderMessage;
+use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
+use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
+use BaksDev\Orders\Order\Entity\Order;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Users\User\Type\Id\UserUid;
 use Psr\Log\LoggerInterface;
 use stdClass;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,82 +48,43 @@ final class NewController extends AbstractController
     /**
      * Метод принимает запросы на создание заказа мегамаркет
      */
-    #[Route('/megamarket/order/new', name: 'megamarket.order.new', methods: ['GET', 'POST'])]
+    #[Route('/megamarket/order/new/{profile}', name: 'megamarket.order.new', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
-        LoggerInterface $megamarketOrdersLogger
+        LoggerInterface $megamarketOrdersLogger,
+        MessageDispatchInterface $messageDispatch,
+        #[ParamConverter(UserProfileUid::class)] $profile = null,
     ): Response {
 
-        $megamarketOrdersLogger->debug($request->getContent());
+        if(empty($profile))
+        {
+            $megamarketOrdersLogger->warning('Идентификатор профиля не найден');
+            return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 0]);
+        }
 
-        $data = json_decode($request->getContent());
+        $megamarketOrdersLogger->debug($request->getContent());
+        $data = json_decode($request->getContent(), false);
+
+        /** _TODO: тестовые данные */
+        // $data = $this->test();
+
+        /**
+         * Создаем новый заказ
+         * @see https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-new-standart
+         */
+
+        $shipments = current($data->data->shipments);
+        $NewMegamarketOrderMessage = new NewMegamarketOrderMessage($shipments->shipmentId, $profile);
+        $messageDispatch->dispatch($NewMegamarketOrderMessage, transport: 'megamarket-orders');
 
         return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 1]);
     }
 
     public function test()
     {
+        /** DBS */
+        $json = '{"meta":{},"data":{"shipments":[{"shipmentId":"9324005526611","shipmentDate":"2024-08-09T16:12:28+03:00","handover":{"packingDate":"2024-08-09T19:00:00+03:00","reserveExpirationDate":"2024-08-29T00:00:00+03:00","outletId":"","serviceScheme":"DELIVERY_BY_MERCHANT","depositedAmount":30584,"deliveryInterval":{"dateFrom":"2024-08-13T10:00:00+03:00","dateTo":"2024-08-15T20:00:00+03:00"},"deliveryId":9385695846770},"customer":{"customerFullName":"Абдуллин Галим","phone":"79153693033","email":"","address":{"source":"Москва, улица Вавилова, 70 к3","postalCode":"119261","fias":{"regionId":"0c5b2444-70a0-4932-980c-b4dc0d3f02b5","destinationId":"0455c6b3-793f-457d-8b42-78b979b947e2"},"geo":{"lat":"55.683041","lon":"37.546646"},"access":{"detachedHouse":false,"entrance":null,"floor":null,"intercom":null,"cargoElevator":false,"comment":"предварительно позвоните за 3-4 часа до доставки.","apartment":""},"regionKladrId":"77","house":"70 к3","block":null,"flat":null,"regionWithType":"Москва","cityWithType":"Москва","cityArea":null,"streetWithType":"улица Вавилова"}},"flags":[],"items":[{"itemIndex":"1","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"2","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"3","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"4","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"5","goodsId":"100029275905","offerId":"delivery","itemName":"Доставка","price":800,"finalPrice":800,"discounts":[],"quantity":1,"taxRate":null,"reservationPerformed":true,"isDigitalMarkRequired":false}]}],"merchantId":175306}}';
 
-        $json = '{
-  "data": {
-    "merchantId": 5046,
-    "shipments": [
-      {
-        "shipmentId": "946032218",
-        "shipmentDate": "2021-02-17T09:34:03+03:00",
-        "items": [
-          {
-            "itemIndex": "1",
-            "goodsId": "100023763738",
-            "offerId": "3951",
-            "itemName": "Вертикальный пылесос Kitfort  KT-535-2 White",
-            "price": 11990,
-            "finalPrice": 5995,
-            "discounts": [
-              {
-                "discountType": "BPG20",
-                "discountDescription": "BPG20",
-                "discountAmount": 1424
-              },
-              {
-                "discountType": "LOY",
-                "discountDescription": "Скидка БР",
-                "discountAmount": 4571
-              }
-            ],
-            "quantity": 1,
-            "taxRate": "20",
-            "reservationPerformed": true,
-            "isDigitalMarkRequired": false
-          }
-        ],
-        "label": {
-          "deliveryId": "933021193",
-          "region": "Воронежская",
-          "city": "Воронеж",
-          "address": "Россия, Воронежская обл.,  Воронеж, Проспект Губкина, 9",
-          "fullName": "Петров Пётр",
-          "merchantName": "ООО \"АЭРО-ТРЕЙД\"",
-          "merchantId": 5046,
-          "shipmentId": "956032218",
-          "shippingDate": "2021-02-21T17:00:00+03:00",
-          "deliveryType": "Самовывоз из пункта выдачи",
-          "labelText": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\"/>\t\n    <title>Маркировочный лист</title>    ..."
-        },
-        "shipping": {
-          "shippingDate": "2021-02-21T17:00:00+03:00",
-          "shippingPoint": 132378
-        },
-        "fulfillmentMethod": "FULFILLMENT_BY_MERCHANT"
-      }
-    ]
-  },
-  "meta": {
-    "source": "OMS"
-  }
-}';
-
-        return json_decode($json);
-
+        return json_decode($json, );
     }
 }

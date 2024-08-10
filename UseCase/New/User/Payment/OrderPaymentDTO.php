@@ -29,7 +29,7 @@ namespace BaksDev\Megamarket\Orders\UseCase\New\User\Payment;
 use BaksDev\Orders\Order\Entity\User\Payment\OrderPaymentInterface;
 use BaksDev\Payment\Type\Id\Choice\TypePaymentCache;
 use BaksDev\Payment\Type\Id\PaymentUid;
-use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentMegamarket;
+use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentFbsMegamarket;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -47,7 +47,7 @@ final class OrderPaymentDTO implements OrderPaymentInterface
     public function __construct()
     {
         /** Способ оплаты наличными при получении */
-        $this->payment = new PaymentUid(TypePaymentMegamarket::class);
+        $this->payment = new PaymentUid(TypePaymentFbsMegamarket::class);
 
         $this->field = new ArrayCollection();
     }

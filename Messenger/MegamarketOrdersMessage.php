@@ -27,12 +27,4 @@ namespace BaksDev\Megamarket\Orders\Messenger;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-final class MegamarketOrdersMessage
-{
-
-    /** Идентификатор */
-    #[Assert\Uuid]
-    private $id = null;
-
-}
+final class MegamarketOrdersMessage {}

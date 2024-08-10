@@ -1,9 +1,17 @@
 megamarket:
-  name: 'Megamarket'
-  desc: 'Доставка Megamarket'
+  fbs:
+    name: 'Склад Yandex'
+    desc: 'Курьерская доставка Megamarket'
+
+    address:
+      name: 'Адрес ПВЗ Megamarket'
+      desc: 'Адрес пункта выдачи заказов Megamarket выбранный клиентом'
 
 
-  address:
-    name: 'Адрес клиента'
-    desc: 'Адрес доставки заказа клиенту'
+  dbs:
+    name: 'Доставка клиенту Megamarket'
+    desc: 'Доставка клиенту Megamarket'
 
+    address:
+      name: 'Адрес клиента'
+      desc: 'Адрес доставки заказа клиенту Megamarket'

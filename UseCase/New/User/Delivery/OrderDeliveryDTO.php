@@ -31,7 +31,7 @@ use BaksDev\Delivery\Type\Event\DeliveryEventUid;
 use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Orders\Order\Entity\User\Delivery\OrderDeliveryInterface;
 use BaksDev\Users\Address\Type\Geocode\GeocodeAddressUid;
-use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryMegamarket;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryFbsMegamarket;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -78,16 +78,22 @@ final class OrderDeliveryDTO implements OrderDeliveryInterface
     private ?DateTimeImmutable $deliveryDate;
 
 
+    /** Стоимость доставки заказа */
+    #[Assert\Valid]
+    private Price\OrderDeliveryPriceDTO $price;
+
+
     public function __construct()
     {
-
         /** Способ доставки Megamarket */
-        $this->delivery = new DeliveryUid(TypeDeliveryMegamarket::class);
-
+        //$this->delivery = new DeliveryUid(TypeDeliveryFbsMegamarket::class);
         $this->field = new ArrayCollection();
 
+        /** По умолчанию дата доставки на след. день */
         $now = (new DateTimeImmutable())->setTime(0, 0, 0);
         $this->deliveryDate = $now->add(new DateInterval('P1D'));
+
+        $this->price = new Price\OrderDeliveryPriceDTO();
     }
 
     /** Способ доставки */
@@ -96,10 +102,10 @@ final class OrderDeliveryDTO implements OrderDeliveryInterface
         return $this->delivery;
     }
 
-//    public function setDelivery(DeliveryUid $delivery): void
-//    {
-//        $this->delivery = $delivery;
-//    }
+    public function setDelivery(DeliveryUid $delivery): void
+    {
+        $this->delivery = $delivery;
+    }
 
     /** Событие способа оплаты (для расчета стоимости) */
     public function getEvent(): DeliveryEventUid
@@ -125,7 +131,7 @@ final class OrderDeliveryDTO implements OrderDeliveryInterface
 
     public function addField(Field\OrderDeliveryFieldDTO $field): void
     {
-        if (!$this->field->contains($field))
+        if(!$this->field->contains($field))
         {
             $this->field->add($field);
         }
@@ -203,7 +209,20 @@ final class OrderDeliveryDTO implements OrderDeliveryInterface
         return $this;
     }
 
+    /**
+     * Price
+     */
+    public function getPrice(): Price\OrderDeliveryPriceDTO
+    {
+        return $this->price;
+    }
 
+    //    public function setPrice(Price\OrderDeliveryPriceDTO $price): self
+    //    {
+    //        $this->price = $price;
+    //        return $this;
+    //        return $this;
+    //    }
 
 
 }

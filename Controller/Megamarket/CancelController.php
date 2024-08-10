@@ -26,6 +26,14 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Controller\Megamarket;
 
 use BaksDev\Core\Controller\AbstractController;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Core\Type\UidType\ParamConverter;
+use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
+use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
+use BaksDev\Orders\Order\Entity\Order;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Users\User\Type\Id\UserUid;
+use Psr\Log\LoggerInterface;
 use stdClass;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,12 +47,42 @@ final class CancelController extends AbstractController
     /**
      * Метод принимает запросы на отмену заказа мегамаркет
      */
-    #[Route('/megamarket/order/cancel', name: 'megamarket.order.cancel', methods: ['GET', 'POST'])]
+    #[Route('/megamarket/order/cancel/{profile}', name: 'megamarket.order.cancel', methods: ['GET', 'POST'])]
     public function index(
-        Request $request
-    ): Response
-    {
+        Request $request,
+        MessageDispatchInterface $messageDispatch,
+        LoggerInterface $megamarketOrdersLogger,
+        #[ParamConverter(UserProfileUid::class)] $profile = null,
+    ): Response {
 
-        return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(),  'success' => 1]);
+        if(empty($profile))
+        {
+            $megamarketOrdersLogger->warning('Идентификатор профиля не найден');
+            return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 0]);
+        }
+
+        $megamarketOrdersLogger->warning($request->getContent());
+        $data = json_decode($request->getContent(), false);
+
+
+        return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 1]);
+
+
+        /**
+         * Делаем отмену заказа
+         * @see https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-cancel-standart
+         */
+
+        //        $MegamarketOrderDTO = new MegamarketOrderDTO($data);
+        //        $Order = $megamarketOrderHandler->handle($MegamarketOrderDTO);
+        //
+        //        if($Order instanceof Order)
+        //        {
+        //            return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 1]);
+        //        }
+        //
+        //        return new JsonResponse(['data' => new stdClass(), 'meta' => new stdClass(), 'success' => 0]);
+
+
     }
 }

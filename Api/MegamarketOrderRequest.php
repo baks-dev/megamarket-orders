@@ -35,18 +35,16 @@ use DateTimeImmutable;
 use DomainException;
 use stdClass;
 
-/**
- * Информация о заказах
- */
 final class MegamarketOrderRequest extends Megamarket
 {
     /**
      * Возвращает информацию о заказе
      *
+     * https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-get-standart
+     *
      */
-    public function find(int|string $shipment)
+    public function find(int|string $shipment): false|array
     {
-
         $response = $this->TokenHttpClient()
             ->request(
                 'GET',
@@ -64,14 +62,9 @@ final class MegamarketOrderRequest extends Megamarket
 
         $content = $response->toArray(false);
 
-        dd($content);
-
-        if($response->getStatusCode() !== 200)
+        if($response->getStatusCode() !== 200 || $content['success'] !== 1)
         {
-            foreach($content['errors'] as $error)
-            {
-                $this->logger->critical('Ошибка при получении заказа '.$shipment  , [__FILE__.':'.__LINE__]);
-            }
+            $this->logger->critical($shipment.': '.$content['error']['message'], [__FILE__.':'.__LINE__]);
 
             throw new DomainException(
                 message: 'Ошибка '.self::class,
@@ -79,6 +72,7 @@ final class MegamarketOrderRequest extends Megamarket
             );
         }
 
-        yield new MegamarketOrderDTO($content['data']['shipments']);
+        return empty($content['data']['shipments']) ? false : current($content['data']['shipments']);
+
     }
 }
