@@ -1,6 +1,6 @@
 megamarket:
   fbs:
-    name: 'Склад Yandex'
+    name: 'Склад Megamarket'
     desc: 'Курьерская доставка Megamarket'
 
     address:

@@ -1,6 +1,6 @@
 megamarket:
   fbs:
-    name: 'Yandex warehouse'
+    name: 'Megamarket warehouse'
     desc: 'Megamarket courier delivery'
 
     address:
@@ -9,7 +9,7 @@ megamarket:
 
 
   dbs:
-    name: 'Delivery to Yandex client'
+    name: 'Delivery to Megamarket client'
     desc: 'Delivery to Megamarket client'
 
     address:
