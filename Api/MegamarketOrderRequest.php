@@ -64,7 +64,7 @@ final class MegamarketOrderRequest extends Megamarket
 
         if($response->getStatusCode() !== 200 || $content['success'] !== 1)
         {
-            $this->logger->critical($shipment.': '.$content['error']['message'], [__FILE__.':'.__LINE__]);
+            $this->logger->critical($shipment.': '.$content['error']['message'], [self::class.':'.__LINE__]);
 
             throw new DomainException(
                 message: 'Ошибка '.self::class,

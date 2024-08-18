@@ -81,7 +81,7 @@ final class NewMegamarketOrderHandler
         /** Делаем проверку, что заказа с таким номером не существует */
         if($this->existsOrderNumber->isExists('M-'.$message->getShipment()))
         {
-            $this->logger->info(sprintf('Заказ Megamarket #%s уже добавлен в систему', $message->getShipment()), [__FILE__.':'.__LINE__]);
+            $this->logger->info(sprintf('Заказ Megamarket #%s уже добавлен в систему', $message->getShipment()), [self::class.':'.__LINE__]);
             return false;
         }
 
@@ -93,7 +93,7 @@ final class NewMegamarketOrderHandler
 
         if($MegamarketOrderRequest === false)
         {
-            $this->logger->critical(sprintf('Ошибка при добавлении заказа Megamarket #%s', $message->getShipment()), [__FILE__.':'.__LINE__]);
+            $this->logger->critical(sprintf('Ошибка при добавлении заказа Megamarket #%s', $message->getShipment()), [self::class.':'.__LINE__]);
             return false;
         }
 
@@ -295,7 +295,7 @@ final class NewMegamarketOrderHandler
 
         $this->logger->critical(
             sprintf('%s: Ошибка при добавлении заказа Megamarket #%s', $Order, $message->getShipment()),
-            [__FILE__.':'.__LINE__]
+            [self::class.':'.__LINE__]
         );
         return false;
 
