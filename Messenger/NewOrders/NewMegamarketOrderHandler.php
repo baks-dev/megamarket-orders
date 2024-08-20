@@ -289,12 +289,12 @@ final class NewMegamarketOrderHandler
 
         if($Order instanceof Order)
         {
-            $this->logger->info(sprintf('Добавили новый заказа Megamarket #%s', $message->getShipment()));
+            $this->logger->info(sprintf('Megamarket: Добавили новый заказа #%s', $message->getShipment()));
             return true;
         }
 
         $this->logger->critical(
-            sprintf('%s: Ошибка при добавлении заказа Megamarket #%s', $Order, $message->getShipment()),
+            sprintf('Megamarket: Ошибка %s при добавлении заказа #%s', $Order, $message->getShipment()),
             [self::class.':'.__LINE__]
         );
         return false;
