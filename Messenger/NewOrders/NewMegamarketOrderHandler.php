@@ -51,6 +51,7 @@ use BaksDev\Users\Address\Services\GeocodeAddressParser;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
 use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormDTO;
 use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormInterface;
+use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserProfileInterface;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -71,6 +72,7 @@ final class NewMegamarketOrderHandler
         private readonly FieldByDeliveryChoiceInterface $deliveryFields,
         private readonly CurrentDeliveryEventInterface $currentDeliveryEvent,
         private readonly ProductConstByArticleInterface $productConstByArticle,
+        private readonly UserByUserProfileInterface $userByUserProfile,
     ) {
         $this->logger = $megamarketOrdersLogger;
 
@@ -78,6 +80,7 @@ final class NewMegamarketOrderHandler
 
     public function __invoke(NewMegamarketOrderMessage $message): bool
     {
+
         /** Делаем проверку, что заказа с таким номером не существует */
         if($this->existsOrderNumber->isExists('M-'.$message->getShipment()))
         {
@@ -98,7 +101,8 @@ final class NewMegamarketOrderHandler
         }
 
 
-        $MegamarketOrderDTO = new MegamarketOrderDTO();
+        $User = $this->userByUserProfile->forProfile($message->getProfile())->findUser();
+        $MegamarketOrderDTO = new MegamarketOrderDTO($User);
         $MegamarketOrderDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер
         $MegamarketOrderDTO->setCreated(new DateTimeImmutable($MegamarketOrderRequest['creationDate'])); // дата создания заказа
 
