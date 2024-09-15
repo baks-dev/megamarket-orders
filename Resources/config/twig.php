@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Config\FrameworkConfig;
+use BaksDev\Megamarket\Orders\BaksDevMegamarketOrdersBundle;
+use Symfony\Config\TwigConfig;
 
-return static function(FrameworkConfig $framework) {
-    
-    $messenger = $framework->messenger();
+return static function (TwigConfig $twig) {
 
-    $messenger
-        ->transport('megamarket-orders')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
-        ->options(['stream' => 'megamarket-orders'])
-        ->failureTransport('failed-megamarket-orders')
-        ->retryStrategy()
-        ->maxRetries(3)
-        ->delay(1000)
-        ->maxDelay(0)
-        ->multiplier(3) // увеличиваем задержку перед каждой повторной попыткой
-        ->service(null)
-
-    ;
-
-    $failure = $framework->messenger();
-
-    $failure->transport('failed-megamarket-orders')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'failed-megamarket-orders'])
-    ;
+    $twig->path(
+        BaksDevMegamarketOrdersBundle::PATH.implode(DIRECTORY_SEPARATOR, ['Resources', 'view', '']), // .'Resources/view',
+        'megamarket-orders'
+    );
 
 };
