@@ -106,6 +106,8 @@ final class NewMegamarketOrderHandler
         $MegamarketOrderDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер
         $MegamarketOrderDTO->setCreated(new DateTimeImmutable($MegamarketOrderRequest['creationDate'])); // дата создания заказа
 
+        $MegamarketOrderInvariableDTO = $MegamarketOrderDTO->getInvariable();
+        $MegamarketOrderInvariableDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер заказа
 
         $OrderDeliveryDTO = $MegamarketOrderDTO->getUsr()->getDelivery();
         $OrderDeliveryDTO->setDeliveryDate(new DateTimeImmutable($MegamarketOrderRequest['deliveryDateFrom']));

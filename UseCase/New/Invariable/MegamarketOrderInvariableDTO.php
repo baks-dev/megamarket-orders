@@ -36,6 +36,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
 {
     /**
+     * Идентификатор заказа
+     */
+    #[Assert\NotBlank]
+    private ?string $number = null;
+
+
+    /**
      * ID пользователя ответственного
      */
     #[Assert\Uuid]
@@ -89,6 +96,20 @@ final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
 
     public function setProfile(?UserProfileUid $profile): self
     {
+        return $this;
+    }
+
+    /**
+     * Number
+     */
+    public function getNumber(): ?string
+    {
+        return $this->number;
+    }
+
+    public function setNumber(?string $number): self
+    {
+        $this->number = $number;
         return $this;
     }
 }
