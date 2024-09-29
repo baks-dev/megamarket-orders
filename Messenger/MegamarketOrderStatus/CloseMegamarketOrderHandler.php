@@ -31,6 +31,7 @@ use BaksDev\Megamarket\Orders\Api\MegamarketOrdersCloseRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusCompleted;
 use HttpRequestException;
 use Psr\Log\LoggerInterface;
@@ -84,7 +85,7 @@ final readonly class CloseMegamarketOrderHandler
         }
 
 
-        if($OrderEvent->isStatusEquals(ProductStockStatusCompleted::class) === false)
+        if($OrderEvent->isStatusEquals(OrderStatusCompleted::class) === false)
         {
             return;
         }
