@@ -43,7 +43,7 @@ use Symfony\Component\DependencyInjection\Attribute\When;
  * @group megamarket-orders
  */
 #[When(env: 'test')]
-class MegamarketOrdersPackageRequestTest extends KernelTestCase
+class MegamarketOrdersCloseRequestTest extends KernelTestCase
 {
     private static MegamarketAuthorizationToken $Authorization;
 
