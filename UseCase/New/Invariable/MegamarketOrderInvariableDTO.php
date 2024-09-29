@@ -27,6 +27,7 @@ namespace BaksDev\Megamarket\Orders\UseCase\New\Invariable;
 
 use BaksDev\Orders\Order\Entity\Invariable\OrderInvariableInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Users\User\Entity\User;
 use BaksDev\Users\User\Type\Id\UserUid;
 use DateTimeImmutable;
 use ReflectionProperty;
@@ -54,14 +55,7 @@ final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
      * Для нового заказа всегда равен NULL
      */
     #[Assert\IsNull]
-    private readonly null $profile;
-
-
-    public function __construct()
-    {
-        $this->profile = null;
-    }
-
+    private readonly UserProfileUid $profile;
 
     /**
      * Usr
@@ -71,11 +65,16 @@ final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
         return $this->usr;
     }
 
-    public function setUsr(?UserUid $usr): self
+    public function setUsr(UserUid|User|null $usr): self
     {
         if(is_null($usr))
         {
             return $this;
+        }
+
+        if($usr instanceof User)
+        {
+            $usr = $usr->getId();
         }
 
         if(!(new ReflectionProperty(self::class, 'usr'))->isInitialized($this))
@@ -94,8 +93,9 @@ final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
         return $this->profile;
     }
 
-    public function setProfile(?UserProfileUid $profile): self
+    public function setProfile(UserProfileUid $profile): self
     {
+        $this->profile = $profile;
         return $this;
     }
 

@@ -67,7 +67,7 @@ final class MegamarketOrderDTO implements OrderEventInterface
 
     /** Постоянная величина */
     #[Assert\Valid]
-    private readonly Invariable\MegamarketOrderInvariableDTO $invariable;
+    private Invariable\MegamarketOrderInvariableDTO $invariable;
 
 
     /** Комментарий к заказу */
@@ -77,15 +77,11 @@ final class MegamarketOrderDTO implements OrderEventInterface
     private ?stdClass $customer = null;
 
 
-    public function __construct(UserEntity|UserUid $user)
+    public function __construct()
     {
         $this->product = new ArrayCollection();
         $this->usr = new User\OrderUserDTO();
-
-        $user = $user instanceof UserEntity ? $user->getId() : $user;
         $this->invariable = new Invariable\MegamarketOrderInvariableDTO();
-        $this->invariable->setUsr($user);
-
     }
 
 

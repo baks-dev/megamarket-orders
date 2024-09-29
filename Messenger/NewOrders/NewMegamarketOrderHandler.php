@@ -57,22 +57,22 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
-final class NewMegamarketOrderHandler
+#[AsMessageHandler(priority: 100)]
+final readonly class NewMegamarketOrderHandler
 {
     private LoggerInterface $logger;
 
     public function __construct(
         LoggerInterface $megamarketOrdersLogger,
-        private readonly ExistsOrderNumberInterface $existsOrderNumber,
-        private readonly MegamarketOrderHandler $megamarketOrderHandler,
-        private readonly MegamarketOrderRequest $megamarketOrderRequest,
-        private readonly FieldValueFormInterface $fieldValue,
-        private readonly GeocodeAddressParser $geocodeAddressParser,
-        private readonly FieldByDeliveryChoiceInterface $deliveryFields,
-        private readonly CurrentDeliveryEventInterface $currentDeliveryEvent,
-        private readonly ProductConstByArticleInterface $productConstByArticle,
-        private readonly UserByUserProfileInterface $userByUserProfile,
+        private ExistsOrderNumberInterface $existsOrderNumber,
+        private MegamarketOrderHandler $megamarketOrderHandler,
+        private MegamarketOrderRequest $megamarketOrderRequest,
+        private FieldValueFormInterface $fieldValue,
+        private GeocodeAddressParser $geocodeAddressParser,
+        private FieldByDeliveryChoiceInterface $deliveryFields,
+        private CurrentDeliveryEventInterface $currentDeliveryEvent,
+        private ProductConstByArticleInterface $productConstByArticle,
+        private UserByUserProfileInterface $userByUserProfile,
     ) {
         $this->logger = $megamarketOrdersLogger;
 
@@ -100,14 +100,17 @@ final class NewMegamarketOrderHandler
             return false;
         }
 
-
-        $User = $this->userByUserProfile->forProfile($message->getProfile())->findUser();
-        $MegamarketOrderDTO = new MegamarketOrderDTO($User);
+        $MegamarketOrderDTO = new MegamarketOrderDTO();
         $MegamarketOrderDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер
         $MegamarketOrderDTO->setCreated(new DateTimeImmutable($MegamarketOrderRequest['creationDate'])); // дата создания заказа
 
+        /** Присваиваем постоянную величину */
+        $User = $this->userByUserProfile->forProfile($message->getProfile())->findUser();
         $MegamarketOrderInvariableDTO = $MegamarketOrderDTO->getInvariable();
         $MegamarketOrderInvariableDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер заказа
+        $MegamarketOrderInvariableDTO->setUsr($User);
+        $MegamarketOrderInvariableDTO->setProfile($message->getProfile());
+
 
         $OrderDeliveryDTO = $MegamarketOrderDTO->getUsr()->getDelivery();
         $OrderDeliveryDTO->setDeliveryDate(new DateTimeImmutable($MegamarketOrderRequest['deliveryDateFrom']));
@@ -295,6 +298,10 @@ final class NewMegamarketOrderHandler
 
         if($Order instanceof Order)
         {
+
+            /** Отправляем сообщение о принятом в обработку заказе */
+
+
             $this->logger->info(sprintf('Megamarket: Добавили новый заказа #%s', $message->getShipment()));
             return true;
         }

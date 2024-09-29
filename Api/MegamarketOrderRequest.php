@@ -34,6 +34,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DomainException;
 use stdClass;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class MegamarketOrderRequest extends Megamarket
 {
@@ -43,36 +44,52 @@ final class MegamarketOrderRequest extends Megamarket
      * https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-get-standart
      *
      */
-    public function find(int|string $shipment): false|array
+    public function find(int|string $order): false|array
     {
-        $response = $this->TokenHttpClient()
-            ->request(
-                'GET',
-                '/api/market/v1/orderService/order/get',
-                ['json' =>
-                    [
-                        'meta' => new stdClass(),
-                        'data' => [
-                            "token" => $this->getToken(),
-                            "shipments" => [(string) $shipment]
+
+        /** Если передан системны идентификатор заказа */
+        $order = (string) $order;
+        $order = str_replace('M-', '', $order);
+
+        $cache = $this->getCacheInit('megamarket-orders');
+
+        $content = $cache->get($order, function (ItemInterface $item) use ($order): array {
+
+            $item->expiresAfter(DateInterval::createFromDateString('1 week'));
+
+            $response = $this->TokenHttpClient()
+                ->request(
+                    'GET',
+                    '/api/market/v1/orderService/order/get',
+                    ['json' =>
+                        [
+                            'meta' => new stdClass(),
+                            'data' => [
+                                "token" => $this->getToken(),
+                                "shipments" => [$order]
+                            ]
                         ]
-                    ]
-                ],
-            );
+                    ],
+                );
 
-        $content = $response->toArray(false);
+            $content = $response->toArray(false);
 
-        if($response->getStatusCode() !== 200 || $content['success'] !== 1)
-        {
-            $this->logger->critical($shipment.': '.$content['error']['message'], [self::class.':'.__LINE__]);
+            if((isset($content['success']) && $content['success'] !== 1) || $response->getStatusCode() !== 200)
+            {
+                $this->logger->critical($order.': '.$content['error']['message'], [self::class.':'.__LINE__]);
 
-            throw new DomainException(
-                message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
-            );
-        }
+                throw new DomainException(
+                    message: 'Ошибка '.self::class,
+                    code: $response->getStatusCode()
+                );
+            }
+
+            return $content;
+
+        });
+
 
         return empty($content['data']['shipments']) ? false : current($content['data']['shipments']);
-
     }
+
 }

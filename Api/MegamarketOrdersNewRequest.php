@@ -42,7 +42,7 @@ final class MegamarketOrdersNewRequest extends Megamarket
     /**
      * Возвращает информацию о заказах за сутки
      *
-     * https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-search-standart
+     * https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/order-search-standart
      *
      */
     public function findAll(?DateInterval $interval = null): false|array
