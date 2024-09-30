@@ -75,7 +75,7 @@ final class MegamarketOrdersCloseRequest extends Megamarket
         /** Проверяем, что передан ключ handoverResult и он равен TRUE */
         foreach($items as $item)
         {
-            if(array_key_exists('handoverResult', $item) || $item['handoverResult'] !== true)
+            if(array_key_exists('handoverResult', $item) === false || $item['handoverResult'] !== true)
             {
                 throw new InvalidArgumentException('Invalid Argument handoverResult');
             }
@@ -138,6 +138,7 @@ final class MegamarketOrdersCloseRequest extends Megamarket
 
 
         $content = $response->toArray(false);
+
 
         /** Статус всегда возвращает 200, делаем ретрай сами */
         if(isset($content['error']))

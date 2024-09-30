@@ -89,7 +89,7 @@ final class MegamarketOrdersPackageRequest extends Megamarket
          */
         if($this->isExecuteEnvironment() === false)
         {
-            return true;
+            //return true;
         }
 
         /** Если передан системны идентификатор заказа */
@@ -122,6 +122,8 @@ final class MegamarketOrdersPackageRequest extends Megamarket
 
 
         $content = $response->toArray(false);
+
+        dd($content);
 
         /** Статус всегда возвращает 200, делаем ретрай сами */
         if(isset($content['error']))

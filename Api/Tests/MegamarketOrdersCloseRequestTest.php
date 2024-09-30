@@ -60,16 +60,17 @@ class MegamarketOrdersCloseRequestTest extends KernelTestCase
     public function testComplete(): void
     {
 
-        self::assertTrue(true);
-        return;
+        //self::assertTrue(true);
+        //return;
 
         /** @var MegamarketOrderRequest $MegamarketOrderRequest */
         $MegamarketOrderRequest = self::getContainer()->get(MegamarketOrderRequest::class);
         $MegamarketOrderRequest->TokenHttpClient(self::$Authorization);
 
-        $number = '1234567890';
+        $number = '9280123901466';
 
         $order = $MegamarketOrderRequest->find($number);
+
 
         $items = null;
 
@@ -85,14 +86,13 @@ class MegamarketOrdersCloseRequestTest extends KernelTestCase
             $items[$key]['handoverResult'] = true;
         }
 
-
-        /** @var MegamarketOrdersPackageRequest $MegamarketOrdersCloseRequest */
+        /** @var MegamarketOrdersCloseRequest $MegamarketOrdersCloseRequest */
         $MegamarketOrdersCloseRequest = self::getContainer()->get(MegamarketOrdersCloseRequest::class);
         $MegamarketOrdersCloseRequest->TokenHttpClient(self::$Authorization);
 
         $close = $MegamarketOrdersCloseRequest
             ->items($items)
-            ->package($number);
+            ->close($number);
 
         // dd($close);
         self::assertTrue($close);
