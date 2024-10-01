@@ -161,11 +161,12 @@ final readonly class PackageMegamarketOrderHandler
             return;
         }
 
-        throw new InvalidArgumentException(
+        $this->logger->critical(
             sprintf(
                 'megamarket-orders: Ошибка при обновлении заказа %s в статус «Укомплектована, готова к выдаче»',
                 $OrderEvent->getOrderNumber()
-            )
+            ),
+            [self::class.':'.__LINE__]
         );
     }
 }

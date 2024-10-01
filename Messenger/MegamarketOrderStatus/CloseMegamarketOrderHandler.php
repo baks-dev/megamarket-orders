@@ -163,11 +163,13 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-        throw new InvalidArgumentException(
+        $this->logger->critical(
             sprintf(
                 'megamarket-orders: Ошибка при обновлении заказа %s в статус «Выдан по месту назначения»',
                 $OrderEvent->getOrderNumber()
-            )
+            ),
+            [self::class.':'.__LINE__]
         );
+
     }
 }
