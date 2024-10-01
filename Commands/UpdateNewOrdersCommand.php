@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Commands;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersNewRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetNewsRequest;
 use BaksDev\Megamarket\Orders\Messenger\NewOrders\NewMegamarketOrderMessage;
 use BaksDev\Megamarket\Repository\AllProfileToken\AllProfileMegamarketTokenInterface;
 use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface;
@@ -51,7 +51,7 @@ class UpdateNewOrdersCommand extends Command
 
     public function __construct(
         private readonly AllProfileMegamarketTokenInterface $allProfileMegamarketToken,
-        private readonly MegamarketOrdersNewRequest $megamarketNewOrdersRequest,
+        private readonly MegamarketOrdersGetNewsRequest $megamarketNewOrdersRequest,
         private readonly ExistsOrderNumberInterface $existsOrderNumber,
         private readonly MessageDispatchInterface $messageDispatch
     ) {

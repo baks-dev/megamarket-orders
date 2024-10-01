@@ -26,8 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersCloseRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostCloseRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
@@ -46,8 +46,8 @@ final readonly class CloseMegamarketOrderHandler
         LoggerInterface $megamarketOrdersLogger,
         private OrderEventInterface $orderEvent,
         private DeduplicatorInterface $deduplicator,
-        private MegamarketOrderRequest $megamarketOrderRequest,
-        private MegamarketOrdersCloseRequest $MegamarketOrdersCloseRequest,
+        private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
+        private MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest,
     ) {
         $this->logger = $megamarketOrdersLogger;
     }
@@ -93,6 +93,12 @@ final readonly class CloseMegamarketOrderHandler
 
         if($OrderEvent->getOrderNumber() === null)
         {
+
+            $this->logger->critical(
+                'products-sign: Невозможно определить номер заказа',
+                [self::class.':'.__LINE__, 'OrderEventUid' => (string) $message->getEvent()]
+            );
+
             return;
         }
 
@@ -110,7 +116,6 @@ final readonly class CloseMegamarketOrderHandler
         $MegamarketOrder = $this->megamarketOrderRequest
             ->profile($UserProfileUid)
             ->find($OrderEvent->getOrderNumber());
-
 
         if($MegamarketOrder === false)
         {

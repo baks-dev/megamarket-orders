@@ -26,8 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPackageRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
@@ -45,8 +45,8 @@ final readonly class PackageMegamarketOrderHandler
         LoggerInterface $megamarketOrdersLogger,
         private OrderEventInterface $orderEvent,
         private DeduplicatorInterface $deduplicator,
-        private MegamarketOrderRequest $megamarketOrderRequest,
-        private MegamarketOrdersPackageRequest $megamarketOrdersPackageRequest,
+        private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
+        private MegamarketOrdersPostPackageRequest $megamarketOrdersPackageRequest,
     ) {
         $this->logger = $megamarketOrdersLogger;
     }

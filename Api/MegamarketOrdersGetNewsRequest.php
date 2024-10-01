@@ -35,7 +35,7 @@ use DateTimeImmutable;
 use DomainException;
 use stdClass;
 
-final class MegamarketOrdersNewRequest extends Megamarket
+final class MegamarketOrdersGetNewsRequest extends Megamarket
 {
     private ?DateTimeImmutable $fromDate = null;
 

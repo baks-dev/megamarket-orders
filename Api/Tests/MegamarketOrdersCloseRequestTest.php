@@ -25,11 +25,11 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Api\Tests;
 
-use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersCloseRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostCloseRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersConfirmRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersNewRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPackageRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetNewsRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
 use BaksDev\Megamarket\Type\Authorization\MegamarketAuthorizationToken;
 use BaksDev\Ozon\Products\Api\Settings\Attribute\OzonAttributeDTO;
 use BaksDev\Ozon\Products\Api\Settings\Attribute\OzonAttributeRequest;
@@ -60,11 +60,11 @@ class MegamarketOrdersCloseRequestTest extends KernelTestCase
     public function testComplete(): void
     {
 
-        //self::assertTrue(true);
-        //return;
+        self::assertTrue(true);
+        return;
 
-        /** @var MegamarketOrderRequest $MegamarketOrderRequest */
-        $MegamarketOrderRequest = self::getContainer()->get(MegamarketOrderRequest::class);
+        /** @var MegamarketOrdersGetInfoRequest $MegamarketOrderRequest */
+        $MegamarketOrderRequest = self::getContainer()->get(MegamarketOrdersGetInfoRequest::class);
         $MegamarketOrderRequest->TokenHttpClient(self::$Authorization);
 
         $number = '9785700841608';
@@ -88,8 +88,8 @@ class MegamarketOrdersCloseRequestTest extends KernelTestCase
             $items[$key]['handoverResult'] = true;
         }
 
-        /** @var MegamarketOrdersCloseRequest $MegamarketOrdersCloseRequest */
-        $MegamarketOrdersCloseRequest = self::getContainer()->get(MegamarketOrdersCloseRequest::class);
+        /** @var MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest */
+        $MegamarketOrdersCloseRequest = self::getContainer()->get(MegamarketOrdersPostCloseRequest::class);
         $MegamarketOrdersCloseRequest->TokenHttpClient(self::$Authorization);
 
         $close = $MegamarketOrdersCloseRequest

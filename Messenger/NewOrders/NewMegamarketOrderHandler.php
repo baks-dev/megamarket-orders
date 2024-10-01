@@ -28,7 +28,7 @@ namespace BaksDev\Megamarket\Orders\Messenger\NewOrders;
 use BaksDev\Core\Type\Field\InputField;
 use BaksDev\Delivery\Repository\CurrentDeliveryEvent\CurrentDeliveryEventInterface;
 use BaksDev\Delivery\Type\Id\DeliveryUid;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryDbsMegamarket;
 use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryFbsMegamarket;
 use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentDbsMegamarket;
@@ -66,7 +66,7 @@ final readonly class NewMegamarketOrderHandler
         LoggerInterface $megamarketOrdersLogger,
         private ExistsOrderNumberInterface $existsOrderNumber,
         private MegamarketOrderHandler $megamarketOrderHandler,
-        private MegamarketOrderRequest $megamarketOrderRequest,
+        private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private FieldValueFormInterface $fieldValue,
         private GeocodeAddressParser $geocodeAddressParser,
         private FieldByDeliveryChoiceInterface $deliveryFields,

@@ -36,7 +36,7 @@ use DomainException;
 use stdClass;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class MegamarketOrderRequest extends Megamarket
+final class MegamarketOrdersGetInfoRequest extends Megamarket
 {
     /**
      * Возвращает информацию о заказе

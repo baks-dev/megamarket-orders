@@ -25,10 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Api\Tests;
 
-use BaksDev\Megamarket\Orders\Api\MegamarketOrderRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersConfirmRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersNewRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPackageRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetNewsRequest;
+use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
 use BaksDev\Megamarket\Type\Authorization\MegamarketAuthorizationToken;
 use BaksDev\Ozon\Products\Api\Settings\Attribute\OzonAttributeDTO;
 use BaksDev\Ozon\Products\Api\Settings\Attribute\OzonAttributeRequest;
@@ -55,14 +55,13 @@ class MegamarketOrdersPackageRequestTest extends KernelTestCase
         );
     }
 
-
     public function testComplete(): void
     {
         self::assertTrue(true);
         return;
 
-        /** @var MegamarketOrderRequest $MegamarketOrderRequest */
-        $MegamarketOrderRequest = self::getContainer()->get(MegamarketOrderRequest::class);
+        /** @var MegamarketOrdersGetInfoRequest $MegamarketOrderRequest */
+        $MegamarketOrderRequest = self::getContainer()->get(MegamarketOrdersGetInfoRequest::class);
         $MegamarketOrderRequest->TokenHttpClient(self::$Authorization);
 
         $number = '1234567890';
@@ -85,8 +84,8 @@ class MegamarketOrdersPackageRequestTest extends KernelTestCase
         }
 
 
-        /** @var MegamarketOrdersPackageRequest $MegamarketOrdersPackageRequest */
-        $MegamarketOrdersPackageRequest = self::getContainer()->get(MegamarketOrdersPackageRequest::class);
+        /** @var MegamarketOrdersPostPackageRequest $MegamarketOrdersPackageRequest */
+        $MegamarketOrdersPackageRequest = self::getContainer()->get(MegamarketOrdersPostPackageRequest::class);
         $MegamarketOrdersPackageRequest->TokenHttpClient(self::$Authorization);
 
         $package = $MegamarketOrdersPackageRequest

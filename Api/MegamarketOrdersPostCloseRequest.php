@@ -32,11 +32,12 @@ use BaksDev\Yandex\Market\Api\YandexMarket;
 use BaksDev\Yandex\Market\Orders\UseCase\New\YandexMarketOrderDTO;
 use DateInterval;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DomainException;
 use InvalidArgumentException;
 use stdClass;
 
-final class MegamarketOrdersPackageRequest extends Megamarket
+final class MegamarketOrdersPostCloseRequest extends Megamarket
 {
     private int $retry = 0;
 
@@ -71,18 +72,27 @@ final class MegamarketOrdersPackageRequest extends Megamarket
             throw new InvalidArgumentException('Invalid Argument items');
         }
 
+        /** Проверяем, что передан ключ handoverResult и он равен TRUE */
+        foreach($items as $item)
+        {
+            if(array_key_exists('handoverResult', $item) === false || $item['handoverResult'] !== true)
+            {
+                throw new InvalidArgumentException('Invalid Argument handoverResult');
+            }
+        }
+
         $this->items = $items;
 
         return $this;
     }
 
     /**
-     * Сообщает о комплектации заказа.
+     * Сообщает о выдаче товара
      *
-     * https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/order-packing-standart
+     * https://partner-wiki.megamarket.ru/merchant-api/4-opisanie-api-dbs/4-1-dbs-s-tsentral-nogo-sklada/4-1-1-opisanie-metodov/4-3-5-order-close
      *
      */
-    public function package(int|string $order): bool
+    public function close(int|string $order): bool
     {
         /**
          * Выполнять операции запроса ТОЛЬКО в PROD окружении
@@ -91,6 +101,7 @@ final class MegamarketOrdersPackageRequest extends Megamarket
         {
             return true;
         }
+
 
         /** Если передан системны идентификатор заказа */
         $order = (string) $order;
@@ -101,10 +112,16 @@ final class MegamarketOrdersPackageRequest extends Megamarket
             throw new InvalidArgumentException('Invalid Argument items');
         }
 
+        /**
+         * Дата выдачи заказа === дата выполнения запроса
+         */
+        $closeDate = new DateTimeImmutable();
+        $closeDate = $closeDate->format(DateTimeInterface::ATOM);
+
         $response = $this->TokenHttpClient()
             ->request(
                 'GET',
-                '/api/market/v1/orderService/order/packing',
+                '/api/market/v1/orderService/order/close',
                 ['json' =>
                     [
                         'meta' => new stdClass(),
@@ -112,7 +129,7 @@ final class MegamarketOrdersPackageRequest extends Megamarket
                             "token" => $this->getToken(),
                             "shipments" => [[
                                 'shipmentId' => $order,
-                                'orderCode' => 'M-'.$order,
+                                'closeDate' => $closeDate,
                                 'items' => $this->items
                             ]]
                         ]
@@ -123,7 +140,9 @@ final class MegamarketOrdersPackageRequest extends Megamarket
 
         $content = $response->toArray(false);
 
+
         dd($content);
+
 
         /** Статус всегда возвращает 200, делаем ретрай сами */
         if(isset($content['error']))
@@ -141,7 +160,7 @@ final class MegamarketOrdersPackageRequest extends Megamarket
             sleep($this->retry);
 
             $this->retry *= 2;
-            $this->package($order);
+            $this->close($order);
         }
 
         return true;
