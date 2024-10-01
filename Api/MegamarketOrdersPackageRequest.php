@@ -89,7 +89,7 @@ final class MegamarketOrdersPackageRequest extends Megamarket
          */
         if($this->isExecuteEnvironment() === false)
         {
-            //return true;
+            return true;
         }
 
         /** Если передан системны идентификатор заказа */

@@ -90,6 +90,13 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
+
+        if($OrderEvent->getOrderNumber() === null)
+        {
+            return;
+        }
+
+
         /** Проверяем, что номер заявки начинается с M- (Megamarket) */
         if(false === str_starts_with($OrderEvent->getOrderNumber(), 'M-'))
         {

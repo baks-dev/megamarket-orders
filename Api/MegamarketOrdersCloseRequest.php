@@ -102,6 +102,7 @@ final class MegamarketOrdersCloseRequest extends Megamarket
             return true;
         }
 
+
         /** Если передан системны идентификатор заказа */
         $order = (string) $order;
         $order = str_replace('M-', '', $order);
@@ -138,6 +139,9 @@ final class MegamarketOrdersCloseRequest extends Megamarket
 
 
         $content = $response->toArray(false);
+
+
+        dd($content);
 
 
         /** Статус всегда возвращает 200, делаем ретрай сами */

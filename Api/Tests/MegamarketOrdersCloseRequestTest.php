@@ -67,9 +67,11 @@ class MegamarketOrdersCloseRequestTest extends KernelTestCase
         $MegamarketOrderRequest = self::getContainer()->get(MegamarketOrderRequest::class);
         $MegamarketOrderRequest->TokenHttpClient(self::$Authorization);
 
-        $number = '9280123901466';
+        $number = '9785700841608';
 
         $order = $MegamarketOrderRequest->find($number);
+
+        dd($order);
 
 
         $items = null;

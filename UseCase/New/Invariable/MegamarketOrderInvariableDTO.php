@@ -54,7 +54,8 @@ final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
      * ID профиля ответственного
      * Для нового заказа всегда равен NULL
      */
-    #[Assert\IsNull]
+    #[Assert\Uuid]
+    #[Assert\NotBlank]
     private readonly UserProfileUid $profile;
 
     /**
