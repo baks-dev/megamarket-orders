@@ -33,7 +33,7 @@ use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusCompleted;
-use HttpRequestException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -163,7 +163,7 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-        throw new HttpRequestException(
+        throw new InvalidArgumentException(
             sprintf(
                 'megamarket-orders: Ошибка при обновлении заказа %s в статус «Выдан по месту назначения»',
                 $OrderEvent->getOrderNumber()

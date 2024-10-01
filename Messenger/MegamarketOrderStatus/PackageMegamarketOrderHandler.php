@@ -32,7 +32,7 @@ use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
-use HttpRequestException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -161,7 +161,7 @@ final readonly class PackageMegamarketOrderHandler
             return;
         }
 
-        throw new HttpRequestException(
+        throw new InvalidArgumentException(
             sprintf(
                 'megamarket-orders: Ошибка при обновлении заказа %s в статус «Укомплектована, готова к выдаче»',
                 $OrderEvent->getOrderNumber()
