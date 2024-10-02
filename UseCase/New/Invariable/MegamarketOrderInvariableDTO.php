@@ -89,7 +89,7 @@ final class MegamarketOrderInvariableDTO implements OrderInvariableInterface
     /**
      * Profile
      */
-    public function getProfile(): null
+    public function getProfile(): UserProfileUid
     {
         return $this->profile;
     }
