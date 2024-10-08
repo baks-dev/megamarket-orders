@@ -34,6 +34,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DomainException;
+use Exception;
 use InvalidArgumentException;
 use stdClass;
 
@@ -118,31 +119,34 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
         $closeDate = new DateTimeImmutable();
         $closeDate = $closeDate->format(DateTimeInterface::ATOM);
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'GET',
-                '/api/market/v1/orderService/order/close',
-                ['json' =>
-                    [
-                        'meta' => new stdClass(),
-                        'data' => [
-                            "token" => $this->getToken(),
-                            "shipments" => [[
-                                'shipmentId' => $order,
-                                'closeDate' => $closeDate,
-                                'items' => $this->items
-                            ]]
+        try
+        {
+            $response = $this->TokenHttpClient()
+                ->request(
+                    'GET',
+                    '/api/market/v1/orderService/order/close',
+                    ['json' =>
+                        [
+                            'meta' => new stdClass(),
+                            'data' => [
+                                "token" => $this->getToken(),
+                                "shipments" => [[
+                                    'shipmentId' => $order,
+                                    'closeDate' => $closeDate,
+                                    'items' => $this->items
+                                ]]
+                            ]
                         ]
-                    ]
-                ],
-            );
+                    ],
+                );
 
-
-        $content = $response->toArray(false);
-
-
-        dd($content);
-
+            $content = $response->toArray(false);
+        }
+        catch(Exception)
+        {
+            $this->logger->critical(sprintf('megamarket-orders: Ошибка при подтверждении выполненного заказа %s', $order));
+            return false;
+        }
 
         /** Статус всегда возвращает 200, делаем ретрай сами */
         if(isset($content['error']))
@@ -152,7 +156,7 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
             {
                 $content['error'][0] = self::class.':'.__LINE__;
 
-                $this->logger->critical(sprintf('Megamarket: Ошибка при подтверждении в обработку нового заказа %s', $order), $content['error']);
+                $this->logger->critical(sprintf('megamarket-orders: Ошибка при подтверждении выполненного заказа %s', $order), $content['error']);
 
                 return false;
             }
