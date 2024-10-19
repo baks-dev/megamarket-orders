@@ -27,11 +27,11 @@ namespace BaksDev\Megamarket\Orders\Api;
 
 use BaksDev\Delivery\Type\Field\DeliveryFieldUid;
 use BaksDev\Megamarket\Api\Megamarket;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use BaksDev\Yandex\Market\Orders\UseCase\New\YandexMarketOrderDTO;
 use DateInterval;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DomainException;
 use stdClass;
 
@@ -63,8 +63,8 @@ final class MegamarketOrdersGetNewsRequest extends Megamarket
                         'meta' => new stdClass(),
                         'data' => [
                             "token" => $this->getToken(),
-                            "dateFrom" => $this->fromDate->format('Y-m-d\TH:i:sP'),
-                            "dateTo" => $dateTime->format('Y-m-d\TH:i:sP'),
+                            "dateFrom" => $this->fromDate->format(DateTimeInterface::W3C),
+                            "dateTo" => $dateTime->format(DateTimeInterface::W3C),
                             "statuses" => ["NEW"]
                         ]
                     ]
