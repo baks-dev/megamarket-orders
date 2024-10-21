@@ -25,14 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Api;
 
-use BaksDev\Delivery\Type\Field\DeliveryFieldUid;
 use BaksDev\Megamarket\Api\Megamarket;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
-use BaksDev\Yandex\Market\Api\YandexMarket;
-use BaksDev\Yandex\Market\Orders\UseCase\New\YandexMarketOrderDTO;
-use DateInterval;
-use DateTimeImmutable;
-use DomainException;
+use Exception;
 use InvalidArgumentException;
 use stdClass;
 
@@ -101,27 +95,36 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
             throw new InvalidArgumentException('Invalid Argument items');
         }
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'GET',
-                '/api/market/v1/orderService/order/packing',
-                ['json' =>
-                    [
-                        'meta' => new stdClass(),
-                        'data' => [
-                            "token" => $this->getToken(),
-                            "shipments" => [[
-                                'shipmentId' => $order,
-                                'orderCode' => 'M-'.$order,
-                                'items' => $this->items
-                            ]]
+        try
+        {
+            $response = $this->TokenHttpClient()
+                ->request(
+                    'GET',
+                    '/api/market/v1/orderService/order/packing',
+                    ['json' =>
+                        [
+                            'meta' => new stdClass(),
+                            'data' => [
+                                "token" => $this->getToken(),
+                                "shipments" => [[
+                                    'shipmentId' => $order,
+                                    'orderCode' => $order,
+                                    'items' => $this->items
+                                ]]
+                            ]
                         ]
-                    ]
-                ],
-            );
+                    ],
+                );
 
 
-        $content = $response->toArray(false);
+            $content = $response->toArray(false);
+        }
+        catch(Exception)
+        {
+            $this->logger->critical(sprintf('megamarket-orders: Ошибка при подтверждении упаковки заказа %s', $order));
+            return false;
+        }
+
 
         /** Статус всегда возвращает 200, делаем ретрай сами */
         if(isset($content['error']))
