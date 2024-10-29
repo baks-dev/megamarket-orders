@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2024.  Baks.dev <admin@baks.dev>
- *
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,15 +25,9 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Api;
 
-use BaksDev\Delivery\Type\Field\DeliveryFieldUid;
 use BaksDev\Megamarket\Api\Megamarket;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
-use BaksDev\Yandex\Market\Api\YandexMarket;
-use BaksDev\Yandex\Market\Orders\UseCase\New\YandexMarketOrderDTO;
-use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DomainException;
 use Exception;
 use InvalidArgumentException;
 use stdClass;
@@ -103,7 +97,6 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
             return true;
         }
 
-
         /** Если передан системны идентификатор заказа */
         $order = (string) $order;
         $order = str_replace('M-', '', $order);
@@ -148,25 +141,6 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
             return false;
         }
 
-        /** Статус всегда возвращает 200, делаем ретрай сами */
-        if(isset($content['error']))
-        {
-            // Если истрачено 5 попыток с задержкой в прогрессии
-            if($this->retry > 32)
-            {
-                $content['error'][0] = self::class.':'.__LINE__;
-
-                $this->logger->critical(sprintf('megamarket-orders: Ошибка при подтверждении выполненного заказа %s', $order), $content['error']);
-
-                return false;
-            }
-
-            sleep($this->retry);
-
-            $this->retry *= 2;
-            $this->close($order);
-        }
-
-        return true;
+        return !isset($content['error']);
     }
 }

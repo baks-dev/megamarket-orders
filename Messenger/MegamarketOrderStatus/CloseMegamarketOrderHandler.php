@@ -47,7 +47,8 @@ final readonly class CloseMegamarketOrderHandler
         private DeduplicatorInterface $deduplicator,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest,
-    ) {
+    )
+    {
         $this->logger = $megamarketOrdersLogger;
     }
 
@@ -70,8 +71,6 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-        $this->logger->debug(self::class, [$message]);
-
         /** @var OrderEvent $OrderEvent */
         $OrderEvent = $this->orderEvent->find($message->getEvent());
 
@@ -90,7 +89,6 @@ final readonly class CloseMegamarketOrderHandler
         {
             return;
         }
-
 
         if($OrderEvent->getOrderNumber() === null)
         {
@@ -128,6 +126,8 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
+        $Deduplicator->save();
+
         /** Формируем список продукции в заказе */
 
         $items = null;
@@ -158,8 +158,6 @@ final readonly class CloseMegamarketOrderHandler
                 sprintf('%s: Обновили статус «Выдан по месту назначения»', $OrderEvent->getOrderNumber()),
                 [self::class.':'.__LINE__]
             );
-
-            $Deduplicator->save();
 
             return;
         }

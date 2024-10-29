@@ -46,7 +46,8 @@ final readonly class PackageMegamarketOrderHandler
         private DeduplicatorInterface $deduplicator,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostPackageRequest $megamarketOrdersPackageRequest,
-    ) {
+    )
+    {
         $this->logger = $megamarketOrdersLogger;
     }
 
@@ -74,8 +75,6 @@ final readonly class PackageMegamarketOrderHandler
         {
             return;
         }
-
-        $this->logger->debug(self::class, [$message]);
 
         /** @var OrderEvent $OrderEvent */
         $OrderEvent = $this->orderEvent->find($message->getEvent());
@@ -125,6 +124,8 @@ final readonly class PackageMegamarketOrderHandler
             return;
         }
 
+        $Deduplicator->save();
+
         /** Формируем список продукции в заказе */
 
         $items = null;
@@ -156,8 +157,6 @@ final readonly class PackageMegamarketOrderHandler
                 sprintf('%s: Обновили статус «Укомплектована, готова к выдаче»', $OrderEvent->getOrderNumber()),
                 [self::class.':'.__LINE__]
             );
-
-            $Deduplicator->save();
 
             return;
         }
