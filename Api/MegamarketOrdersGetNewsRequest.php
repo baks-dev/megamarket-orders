@@ -29,6 +29,7 @@ use BaksDev\Megamarket\Api\Megamarket;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Exception;
 use stdClass;
 
 final class MegamarketOrdersGetNewsRequest extends Megamarket
@@ -41,7 +42,7 @@ final class MegamarketOrdersGetNewsRequest extends Megamarket
      * https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/order-search-standart
      *
      */
-    public function findAll(?DateInterval $interval = null): false|array
+    public function findAll(?DateInterval $interval = null): array|false
     {
         if(!$this->fromDate)
         {
@@ -50,24 +51,34 @@ final class MegamarketOrdersGetNewsRequest extends Megamarket
             $this->fromDate = $dateTime->sub($interval ?? DateInterval::createFromDateString('1 day'));
         }
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'GET',
-                '/api/market/v1/orderService/order/search',
-                ['json' =>
-                    [
-                        'meta' => new stdClass(),
-                        'data' => [
-                            "token" => $this->getToken(),
-                            "dateFrom" => $this->fromDate->format(DateTimeInterface::W3C),
-                            "dateTo" => $dateTime->format(DateTimeInterface::W3C),
-                            "statuses" => ["NEW"]
+        try
+        {
+            $response = $this->TokenHttpClient()
+                ->request(
+                    'GET',
+                    '/api/market/v1/orderService/order/search',
+                    ['json' =>
+                        [
+                            'meta' => new stdClass(),
+                            'data' => [
+                                "token" => $this->getToken(),
+                                "dateFrom" => $this->fromDate->format(DateTimeInterface::W3C),
+                                "dateTo" => $dateTime->format(DateTimeInterface::W3C),
+                                "statuses" => ["NEW"]
+                            ]
                         ]
-                    ]
-                ],
-            );
+                    ],
+                );
 
-        $content = $response->toArray(false);
+            $content = $response->toArray(false);
+
+        }
+        catch(Exception)
+        {
+            $this->logger->critical('megamarket-orders: Ошибка при получении новых заказов');
+
+            return false;
+        }
 
         if($response->getStatusCode() !== 200 || $content['success'] !== 1)
         {

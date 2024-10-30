@@ -26,6 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
+use BaksDev\Core\Messenger\MessageDelay;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostCloseRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
@@ -45,6 +47,7 @@ final readonly class CloseMegamarketOrderHandler
         LoggerInterface $megamarketOrdersLogger,
         private OrderEventInterface $orderEvent,
         private DeduplicatorInterface $deduplicator,
+        private MessageDispatchInterface $messageDispatch,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest,
     )
@@ -92,9 +95,8 @@ final readonly class CloseMegamarketOrderHandler
 
         if($OrderEvent->getOrderNumber() === null)
         {
-
             $this->logger->critical(
-                'products-sign: Невозможно определить номер заказа',
+                'megamarket-orders: Невозможно определить номер заказа',
                 [self::class.':'.__LINE__, 'OrderEventUid' => (string) $message->getEvent()]
             );
 
@@ -109,7 +111,6 @@ final readonly class CloseMegamarketOrderHandler
         }
 
         /** Получаем информацию о заказе */
-
         $UserProfileUid = $OrderEvent->getOrderProfile();
 
         $MegamarketOrder = $this->megamarketOrderRequest
@@ -126,20 +127,12 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-        $Deduplicator->save();
-
         /** Формируем список продукции в заказе */
 
         $items = null;
 
         foreach($MegamarketOrder['items'] as $key => $product)
         {
-            /** Пропускаем элемент с доставкой */
-            if($product['offerId'] === 'delivery')
-            {
-                continue;
-            }
-
             $items[$key]['itemIndex'] = $product['itemIndex'];
             $items[$key]['handoverResult'] = true;
         }
@@ -159,16 +152,15 @@ final readonly class CloseMegamarketOrderHandler
                 [self::class.':'.__LINE__]
             );
 
+            $Deduplicator->save();
+
             return;
         }
 
-        $this->logger->critical(
-            sprintf(
-                'megamarket-orders: Ошибка при обновлении заказа %s в статус «Выдан по месту назначения»',
-                $OrderEvent->getOrderNumber()
-            ),
-            [self::class.':'.__LINE__]
+        $this->messageDispatch->dispatch(
+            message: $message,
+            stamps: [new MessageDelay('5 minutes')],
+            transport: 'megamarket-orders'
         );
-
     }
 }

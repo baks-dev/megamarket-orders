@@ -95,37 +95,44 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
             throw new InvalidArgumentException('Invalid Argument items');
         }
 
+
+        $data = [
+            'meta' => new stdClass(),
+            'data' => [
+                "token" => $this->getToken(),
+                "shipments" => [[
+                    'shipmentId' => $order,
+                    'orderCode' => $order,
+                    'items' => $this->items
+                ]]
+            ]
+        ];
+
         try
         {
             $response = $this->TokenHttpClient()
                 ->request(
                     'GET',
                     '/api/market/v1/orderService/order/packing',
-                    ['json' =>
-                        [
-                            'meta' => new stdClass(),
-                            'data' => [
-                                "token" => $this->getToken(),
-                                "shipments" => [[
-                                    'shipmentId' => $order,
-                                    'orderCode' => $order,
-                                    'items' => $this->items
-                                ]]
-                            ]
-                        ]
-                    ],
+                    ['json' => $data],
                 );
-
 
             $content = $response->toArray(false);
 
         }
         catch(Exception)
         {
-            $this->logger->critical(sprintf('megamarket-orders: Ошибка при подтверждении упаковки заказа %s', $order));
+            $this->logger->critical('megamarket-orders: Ошибка при подтверждении упаковки заказа %s', $data);
+
             return false;
         }
 
-        return !isset($content['error']);
+        if(isset($content['error']))
+        {
+            $this->logger->critical('megamarket-orders: Ошибка при подтверждении упаковки заказа %s', $data);
+            return false;
+        }
+
+        return true;
     }
 }

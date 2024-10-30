@@ -110,7 +110,19 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
          * Дата выдачи заказа === дата выполнения запроса
          */
         $closeDate = new DateTimeImmutable();
-        $closeDate = $closeDate->format(DateTimeInterface::ATOM);
+        $closeDate = $closeDate->format(DateTimeInterface::W3C);
+
+        $data = [
+            'meta' => new stdClass(),
+            'data' => [
+                "token" => $this->getToken(),
+                "shipments" => [[
+                    'shipmentId' => $order,
+                    'closeDate' => $closeDate,
+                    'items' => $this->items
+                ]]
+            ]
+        ];
 
         try
         {
@@ -118,29 +130,26 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
                 ->request(
                     'GET',
                     '/api/market/v1/orderService/order/close',
-                    ['json' =>
-                        [
-                            'meta' => new stdClass(),
-                            'data' => [
-                                "token" => $this->getToken(),
-                                "shipments" => [[
-                                    'shipmentId' => $order,
-                                    'closeDate' => $closeDate,
-                                    'items' => $this->items
-                                ]]
-                            ]
-                        ]
-                    ],
+                    ['json' => $data],
                 );
 
             $content = $response->toArray(false);
+
         }
         catch(Exception)
         {
-            $this->logger->critical(sprintf('megamarket-orders: Ошибка при подтверждении выполненного заказа %s', $order));
+            $this->logger->critical('megamarket-orders: Ошибка при подтверждении выполненного заказа', $data);
+
             return false;
         }
 
-        return !isset($content['error']);
+        if(isset($content['error']))
+        {
+            $this->logger->critical('megamarket-orders: Ошибка при подтверждении выполненного заказа', $data);
+
+            return false;
+        }
+
+        return true;
     }
 }

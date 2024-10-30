@@ -26,6 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
+use BaksDev\Core\Messenger\MessageDelay;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
@@ -44,6 +46,7 @@ final readonly class PackageMegamarketOrderHandler
         LoggerInterface $megamarketOrdersLogger,
         private OrderEventInterface $orderEvent,
         private DeduplicatorInterface $deduplicator,
+        private MessageDispatchInterface $messageDispatch,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostPackageRequest $megamarketOrdersPackageRequest,
     )
@@ -89,7 +92,6 @@ final readonly class PackageMegamarketOrderHandler
             return;
         }
 
-
         if($OrderEvent->isStatusEquals(OrderStatusNew::class) === false)
         {
             return;
@@ -97,6 +99,11 @@ final readonly class PackageMegamarketOrderHandler
 
         if($OrderEvent->getOrderNumber() === null)
         {
+            $this->logger->critical(
+                'megamarket-orders: Невозможно определить номер заказа',
+                [self::class.':'.__LINE__, 'OrderEventUid' => (string) $message->getEvent()]
+            );
+
             return;
         }
 
@@ -124,7 +131,6 @@ final readonly class PackageMegamarketOrderHandler
             return;
         }
 
-        $Deduplicator->save();
 
         /** Формируем список продукции в заказе */
 
@@ -132,7 +138,7 @@ final readonly class PackageMegamarketOrderHandler
 
         foreach($MegamarketOrder['items'] as $key => $product)
         {
-            /** Пропускаем элемент с доставкой */
+            /** При упаковке пропускаем элемент с доставкой */
             if($product['offerId'] === 'delivery')
             {
                 continue;
@@ -158,15 +164,15 @@ final readonly class PackageMegamarketOrderHandler
                 [self::class.':'.__LINE__]
             );
 
+            $Deduplicator->save();
+
             return;
         }
 
-        $this->logger->critical(
-            sprintf(
-                'megamarket-orders: Ошибка при обновлении заказа %s в статус «Укомплектована, готова к выдаче»',
-                $OrderEvent->getOrderNumber()
-            ),
-            [self::class.':'.__LINE__]
+        $this->messageDispatch->dispatch(
+            message: $message,
+            stamps: [new MessageDelay('5 minutes')],
+            transport: 'megamarket-orders'
         );
     }
 }

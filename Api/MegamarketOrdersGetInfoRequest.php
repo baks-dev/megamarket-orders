@@ -26,9 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Api;
 
 use BaksDev\Megamarket\Api\Megamarket;
-use DateInterval;
+use Exception;
 use stdClass;
-use Symfony\Contracts\Cache\ItemInterface;
 
 final class MegamarketOrdersGetInfoRequest extends Megamarket
 {
@@ -44,12 +43,8 @@ final class MegamarketOrdersGetInfoRequest extends Megamarket
         $order = (string) $order;
         $order = str_replace('M-', '', $order);
 
-        $cache = $this->getCacheInit('megamarket-orders');
-
-        $content = $cache->get($order, function(ItemInterface $item) use ($order): array|false {
-
-            $item->expiresAfter(DateInterval::createFromDateString('1 week'));
-
+        try
+        {
             $response = $this->TokenHttpClient()
                 ->request(
                     'GET',
@@ -67,16 +62,21 @@ final class MegamarketOrdersGetInfoRequest extends Megamarket
 
             $content = $response->toArray(false);
 
-            if((isset($content['success']) && $content['success'] !== 1) || $response->getStatusCode() !== 200)
-            {
-                $this->logger->critical($order.': '.$content['error']['message'], [self::class.':'.__LINE__]);
+        }
+        catch(Exception)
+        {
+            $this->logger->critical(sprintf('megamarket-orders: Ошибка при получении информации о заказе %s', $order));
 
-                return false;
-            }
+            return false;
+        }
 
-            return $content;
 
-        });
+        if((isset($content['success']) && $content['success'] !== 1) || $response->getStatusCode() !== 200)
+        {
+            $this->logger->critical($order.': '.$content['error']['message'], [self::class.':'.__LINE__]);
+
+            return false;
+        }
 
 
         return empty($content['data']['shipments']) ? false : current($content['data']['shipments']);
