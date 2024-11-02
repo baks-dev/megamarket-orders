@@ -95,9 +95,9 @@ final readonly class CloseMegamarketOrderHandler
 
         if($OrderEvent->getOrderNumber() === null)
         {
-            $this->logger->critical(
-                'megamarket-orders: Невозможно определить номер заказа',
-                [self::class.':'.__LINE__, 'OrderEventUid' => (string) $message->getEvent()]
+            $this->logger->warning(
+                'Невозможно определить номер заказа (возможно изменилось событие)',
+                [self::class.':'.__LINE__, 'OrderUid' => (string) $message->getId()]
             );
 
             return;
