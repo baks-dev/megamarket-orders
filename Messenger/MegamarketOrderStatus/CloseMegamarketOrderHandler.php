@@ -33,6 +33,7 @@ use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostCloseRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
+use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusCompleted;
 use Psr\Log\LoggerInterface;
@@ -50,6 +51,7 @@ final readonly class CloseMegamarketOrderHandler
         private MessageDispatchInterface $messageDispatch,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest,
+        private NumberByOrderInterface $NumberByOrderRepository,
     )
     {
         $this->logger = $megamarketOrdersLogger;
@@ -93,19 +95,29 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-        if($OrderEvent->getOrderNumber() === null)
-        {
-            $this->logger->warning(
-                'Невозможно определить номер заказа (возможно изменилось событие)',
-                [self::class.':'.__LINE__, 'OrderUid' => (string) $message->getId()]
-            );
+        $number = $OrderEvent->getOrderNumber();
 
-            return;
+        if($number === null)
+        {
+            /** Пробуем определить номер по идентификатору заказа если событие изменилось */
+
+            $number = $this->NumberByOrderRepository
+                ->forOrder($message->getId())
+                ->find();
+
+            if(false === $number)
+            {
+                $this->logger->critical(
+                    'megamarket-orders: Невозможно определить номер заказа (возможно изменилось событие)',
+                    [self::class.':'.__LINE__, 'OrderUid' => (string) $message->getId()]
+                );
+
+                return;
+            }
         }
 
-
         /** Проверяем, что номер заявки начинается с M- (Megamarket) */
-        if(false === str_starts_with($OrderEvent->getOrderNumber(), 'M-'))
+        if(false === str_starts_with($number, 'M-'))
         {
             return;
         }
@@ -115,12 +127,12 @@ final readonly class CloseMegamarketOrderHandler
 
         $MegamarketOrder = $this->megamarketOrderRequest
             ->profile($UserProfileUid)
-            ->find($OrderEvent->getOrderNumber());
+            ->find($number);
 
         if($MegamarketOrder === false)
         {
             $this->logger->critical(
-                sprintf('megamarket-orders: Заказ Megamarket %s не найден', $OrderEvent->getOrderNumber()),
+                sprintf('megamarket-orders: Заказ Megamarket %s не найден', $number),
                 [self::class.':'.__LINE__]
             );
 
@@ -143,12 +155,12 @@ final readonly class CloseMegamarketOrderHandler
         $package = $this->MegamarketOrdersCloseRequest
             ->profile($UserProfileUid)
             ->items($items)
-            ->close($OrderEvent->getOrderNumber());
+            ->close($number);
 
         if($package === true)
         {
             $this->logger->info(
-                sprintf('%s: Обновили статус «Выдан по месту назначения»', $OrderEvent->getOrderNumber()),
+                sprintf('%s: Обновили статус «Выдан по месту назначения»', $number),
                 [self::class.':'.__LINE__]
             );
 
