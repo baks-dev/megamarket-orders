@@ -23,18 +23,13 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus;
+namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package;
 
-use BaksDev\Core\Deduplicator\DeduplicatorInterface;
+
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
-use BaksDev\Orders\Order\Entity\Event\OrderEvent;
-use BaksDev\Orders\Order\Messenger\OrderMessage;
-use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
-use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
-use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -45,12 +40,9 @@ final readonly class PackageMegamarketOrderHandler
 
     public function __construct(
         LoggerInterface $megamarketOrdersLogger,
-        private OrderEventInterface $orderEvent,
-        private DeduplicatorInterface $deduplicator,
         private MessageDispatchInterface $messageDispatch,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostPackageRequest $megamarketOrdersPackageRequest,
-        private NumberByOrderInterface $NumberByOrderRepository,
     )
     {
         $this->logger = $megamarketOrdersLogger;
@@ -60,77 +52,13 @@ final readonly class PackageMegamarketOrderHandler
      * Метод отправляет уведомление Megamarket
      * об комплектации заказа (принят в обработку)
      */
-    public function __invoke(OrderMessage $message): void
+    public function __invoke(PackageMegamarketOrderMessage $message): void
     {
-        /** Новый заказ не имеет предыдущего события!!! */
-        if($message->getLast())
-        {
-            return;
-        }
-
-        $Deduplicator = $this->deduplicator
-            ->namespace('megamarket-orders')
-            ->deduplication([
-                (string) $message->getId(),
-                OrderStatusNew::STATUS,
-                self::class
-            ]);
-
-        if($Deduplicator->isExecuted())
-        {
-            return;
-        }
-
-        /** @var OrderEvent $OrderEvent */
-        $OrderEvent = $this->orderEvent->find($message->getEvent());
-
-        if(!$OrderEvent)
-        {
-            $this->logger->critical(
-                'products-sign: Не найдено событие OrderEvent',
-                [self::class.':'.__LINE__, 'OrderEventUid' => (string) $message->getEvent()]
-            );
-
-            return;
-        }
-
-        if($OrderEvent->isStatusEquals(OrderStatusNew::class) === false)
-        {
-            return;
-        }
-
-        $number = $OrderEvent->getOrderNumber();
-
-        if($number === null)
-        {
-            /**
-             * Пробуем определить номер по идентификатору заказа если событие изменилось
-             */
-
-            $number = $this->NumberByOrderRepository
-                ->forOrder($message->getId())
-                ->find();
-
-            if(false === $number)
-            {
-                $this->logger->critical(
-                    'megamarket-orders: Невозможно определить номер заказа (возможно изменилось событие)',
-                    [self::class.':'.__LINE__, 'OrderUid' => (string) $message->getId()]
-                );
-
-                return;
-            }
-        }
-
-        /** Проверяем, что номер заявки начинается с M- (Megamarket) */
-        if(false === str_starts_with($number, 'M-'))
-        {
-            return;
-        }
 
         /** Получаем информацию о заказе */
 
-        $UserProfileUid = $OrderEvent->getOrderProfile();
+        $UserProfileUid = $message->getProfile();
+        $number = $message->getNumber();
 
         $MegamarketOrder = $this->megamarketOrderRequest
             ->profile($UserProfileUid)
@@ -138,14 +66,11 @@ final readonly class PackageMegamarketOrderHandler
 
         if($MegamarketOrder === false)
         {
-            $this->logger->critical(
-                sprintf('megamarket-orders: Заказ Megamarket %s не найден', $number),
-                [self::class.':'.__LINE__]
-            );
+            // Пробуем упаковать заказ через минуту
+            $this->retry($message);
 
             return;
         }
-
 
         /** Формируем список продукции в заказе */
 
@@ -179,14 +104,24 @@ final readonly class PackageMegamarketOrderHandler
                 [self::class.':'.__LINE__]
             );
 
-            $Deduplicator->save();
-
             return;
         }
 
+        // Пробуем упаковать заказ через минуту
+        $this->retry($message);
+    }
+
+    private function retry(PackageMegamarketOrderMessage $message): void
+    {
+
+        $this->logger->critical(
+            sprintf('megamarket-orders: Пробуем упаковать заказ %s через 1 минуту', $message->getNumber()),
+            [self::class.':'.__LINE__]
+        );
+
         $this->messageDispatch->dispatch(
             message: $message,
-            stamps: [new MessageDelay('5 minutes')],
+            stamps: [new MessageDelay('1 minutes')],
             transport: 'megamarket-orders'
         );
     }

@@ -63,9 +63,12 @@ final class MegamarketOrdersGetInfoRequest extends Megamarket
             $content = $response->toArray(false);
 
         }
-        catch(Exception)
+        catch(Exception $exception)
         {
-            $this->logger->critical(sprintf('megamarket-orders: Ошибка при получении информации о заказе %s', $order));
+            $this->logger->critical(
+                sprintf('megamarket-orders: Ошибка при получении информации о заказе %s', $order),
+                [self::class, $exception->getMessage()]
+            );
 
             return false;
         }

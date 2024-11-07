@@ -23,24 +23,20 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus;
+namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
-use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
-use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostCloseRequest;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
-use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
-use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusCompleted;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
-final readonly class CloseMegamarketOrderHandler
+final readonly class PackageMegamarketOrderDispatch
 {
     private LoggerInterface $logger;
 
@@ -49,8 +45,6 @@ final readonly class CloseMegamarketOrderHandler
         private OrderEventInterface $orderEvent,
         private DeduplicatorInterface $deduplicator,
         private MessageDispatchInterface $messageDispatch,
-        private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
-        private MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest,
         private NumberByOrderInterface $NumberByOrderRepository,
     )
     {
@@ -58,16 +52,22 @@ final readonly class CloseMegamarketOrderHandler
     }
 
     /**
-     * Метод отправляет уведомление Megamarket о выполненном заказе
-     * если Completed «Выдан по месту назначения»
+     * Метод отправляет уведомление Megamarket
+     * об комплектации заказа (принят в обработку)
      */
     public function __invoke(OrderMessage $message): void
     {
+        /** Новый заказ не имеет предыдущего события!!! */
+        if($message->getLast())
+        {
+            return;
+        }
+
         $Deduplicator = $this->deduplicator
             ->namespace('megamarket-orders')
             ->deduplication([
                 (string) $message->getId(),
-                ProductStockStatusCompleted::STATUS,
+                OrderStatusNew::STATUS,
                 self::class
             ]);
 
@@ -89,8 +89,7 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-
-        if($OrderEvent->isStatusEquals(OrderStatusCompleted::class) === false)
+        if($OrderEvent->isStatusEquals(OrderStatusNew::class) === false)
         {
             return;
         }
@@ -99,7 +98,9 @@ final readonly class CloseMegamarketOrderHandler
 
         if($number === null)
         {
-            /** Пробуем определить номер по идентификатору заказа если событие изменилось */
+            /**
+             * Пробуем определить номер по идентификатору заказа если событие изменилось
+             */
 
             $number = $this->NumberByOrderRepository
                 ->forOrder($message->getId())
@@ -122,57 +123,17 @@ final readonly class CloseMegamarketOrderHandler
             return;
         }
 
-        /** Получаем информацию о заказе */
-        $UserProfileUid = $OrderEvent->getOrderProfile();
-
-        $MegamarketOrder = $this->megamarketOrderRequest
-            ->profile($UserProfileUid)
-            ->find($number);
-
-        if($MegamarketOrder === false)
-        {
-            $this->logger->critical(
-                sprintf('megamarket-orders: Заказ Megamarket %s не найден', $number),
-                [self::class.':'.__LINE__]
-            );
-
-            return;
-        }
-
-        /** Формируем список продукции в заказе */
-
-        $items = null;
-
-        foreach($MegamarketOrder['items'] as $key => $product)
-        {
-            $items[$key]['itemIndex'] = $product['itemIndex'];
-            $items[$key]['handoverResult'] = true;
-        }
-
-        /**
-         * Отправляем уведомление о комплектации заказа
-         */
-        $package = $this->MegamarketOrdersCloseRequest
-            ->profile($UserProfileUid)
-            ->items($items)
-            ->close($number);
-
-        if($package === true)
-        {
-            $this->logger->info(
-                sprintf('%s: Обновили статус «Выдан по месту назначения»', $number),
-                [self::class.':'.__LINE__]
-            );
-
-            $Deduplicator->save();
-
-            return;
-        }
+        $PackageMegamarketOrderMessage = new PackageMegamarketOrderMessage(
+            $number,
+            $OrderEvent->getOrderProfile()
+        );
 
         $this->messageDispatch->dispatch(
-            message: $message,
-            stamps: [new MessageDelay('5 minutes')],
+            message: $PackageMegamarketOrderMessage,
             transport: 'megamarket-orders'
         );
+
+        $Deduplicator->save();
+
     }
 }
