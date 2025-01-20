@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -55,15 +55,14 @@ use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserPro
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 100)]
 final readonly class NewMegamarketOrderHandler
 {
-    private LoggerInterface $logger;
-
     public function __construct(
-        LoggerInterface $megamarketOrdersLogger,
+        #[Target('megamarketOrdersLogger')] private LoggerInterface $logger,
         private ExistsOrderNumberInterface $existsOrderNumber,
         private MegamarketOrderHandler $megamarketOrderHandler,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
@@ -73,11 +72,7 @@ final readonly class NewMegamarketOrderHandler
         private CurrentDeliveryEventInterface $currentDeliveryEvent,
         private ProductConstByArticleInterface $productConstByArticle,
         private UserByUserProfileInterface $userByUserProfile,
-    )
-    {
-        $this->logger = $megamarketOrdersLogger;
-
-    }
+    ) {}
 
     public function __invoke(NewMegamarketOrderMessage $message): bool
     {

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,23 +31,18 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostCloseRequest;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
 final readonly class CloseMegamarketOrderHandler
 {
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        LoggerInterface $megamarketOrdersLogger,
+        #[Target('megamarketOrdersLogger')] private readonly LoggerInterface $logger,
         private MegamarketOrdersGetInfoRequest $megamarketOrderRequest,
         private MegamarketOrdersPostCloseRequest $MegamarketOrdersCloseRequest,
         private MessageDispatchInterface $messageDispatch,
-    )
-    {
-        $this->logger = $megamarketOrdersLogger;
-    }
+    ) {}
 
     /**
      * Метод отправляет уведомление Megamarket о выполненном заказе
