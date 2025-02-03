@@ -101,7 +101,7 @@ final readonly class NewMegamarketOrderHandler
         $MegamarketOrderDTO->setCreated(new DateTimeImmutable($MegamarketOrderRequest['creationDate'])); // дата создания заказа
 
         /** Присваиваем постоянную величину */
-        $User = $this->userByUserProfile->forProfile($message->getProfile())->findUser();
+        $User = $this->userByUserProfile->forProfile($message->getProfile())->find();
         $MegamarketOrderInvariableDTO = $MegamarketOrderDTO->getInvariable();
         $MegamarketOrderInvariableDTO->setNumber('M-'.$MegamarketOrderRequest['shipmentId']); // номер заказа
         $MegamarketOrderInvariableDTO->setUsr($User);
