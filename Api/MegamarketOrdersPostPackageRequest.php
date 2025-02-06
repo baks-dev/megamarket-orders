@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -95,7 +95,6 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
             throw new InvalidArgumentException('Invalid Argument items');
         }
 
-
         $data = [
             'meta' => new stdClass(),
             'data' => [
@@ -120,16 +119,22 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
             $content = $response->toArray(false);
 
         }
-        catch(Exception)
+        catch(Exception $exception)
         {
-            $this->logger->critical('megamarket-orders: Ошибка при подтверждении упаковки заказа %s', $data);
+            $this->logger->critical(
+                'megamarket-orders: Ошибка при подтверждении упаковки заказа %s',
+                [$data, $exception]
+            );
 
             return false;
         }
 
         if(isset($content['error']))
         {
-            $this->logger->critical('megamarket-orders: Ошибка при подтверждении упаковки заказа %s', $data);
+            $this->logger->critical(
+                'megamarket-orders: Ошибка при подтверждении упаковки заказа %s',
+                [$data, $content]
+            );
             return false;
         }
 

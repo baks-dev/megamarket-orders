@@ -118,7 +118,7 @@ final readonly class PackageMegamarketOrderHandler
         $this->messageDispatch->dispatch(
             message: $message,
             stamps: [new MessageDelay('1 minutes')],
-            transport: 'megamarket-orders'
+            transport: 'megamarket-orders-low'
         );
     }
 }
