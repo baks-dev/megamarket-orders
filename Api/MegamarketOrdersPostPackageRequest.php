@@ -78,11 +78,9 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
      */
     public function package(int|string $order): bool
     {
-        /**
-         * Выполнять операции запроса ТОЛЬКО в PROD окружении
-         */
         if($this->isExecuteEnvironment() === false)
         {
+            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
             return true;
         }
 
