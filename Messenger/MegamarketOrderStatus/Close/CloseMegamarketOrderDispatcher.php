@@ -37,21 +37,22 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * Метод отправляет уведомление Megamarket о выполненном заказе
+ * если Completed «Выдан по месту назначения»
+ */
 #[AsMessageHandler(priority: 0)]
-final readonly class CloseMegamarketOrderDispatch
+final readonly class CloseMegamarketOrderDispatcher
 {
     public function __construct(
-        #[Target('megamarketOrdersLogger')] private readonly LoggerInterface $logger,
+        #[Target('megamarketOrdersLogger')] private LoggerInterface $logger,
         private OrderEventInterface $orderEvent,
         private DeduplicatorInterface $deduplicator,
         private MessageDispatchInterface $messageDispatch,
         private NumberByOrderInterface $NumberByOrderRepository,
     ) {}
 
-    /**
-     * Метод отправляет уведомление Megamarket о выполненном заказе
-     * если Completed «Выдан по месту назначения»
-     */
+
     public function __invoke(OrderMessage $message): void
     {
         $Deduplicator = $this->deduplicator

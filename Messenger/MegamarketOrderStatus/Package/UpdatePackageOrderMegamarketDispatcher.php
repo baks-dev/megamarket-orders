@@ -36,8 +36,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(priority: 0)]
-final readonly class PackageMegamarketOrderDispatch
+/**
+ * Если поступает новый заказ Megamarket - отправляем уведомление о статусе «Принят в обработку»
+ */
+#[AsMessageHandler(priority: 9)]
+final readonly class UpdatePackageOrderMegamarketDispatcher
 {
     public function __construct(
         #[Target('megamarketOrdersLogger')] private LoggerInterface $logger,
@@ -47,10 +50,7 @@ final readonly class PackageMegamarketOrderDispatch
         private NumberByOrderInterface $NumberByOrderRepository,
     ) {}
 
-    /**
-     * Метод отправляет уведомление Megamarket
-     * об комплектации заказа (принят в обработку)
-     */
+
     public function __invoke(OrderMessage $message): void
     {
         /** Новый заказ не имеет предыдущего события!!! */
@@ -119,7 +119,7 @@ final readonly class PackageMegamarketOrderDispatch
             return;
         }
 
-        $PackageMegamarketOrderMessage = new PackageMegamarketOrderMessage(
+        $PackageMegamarketOrderMessage = new UpdatePackageOrderMegamarketMessage(
             $number,
             $OrderEvent->getOrderProfile()
         );

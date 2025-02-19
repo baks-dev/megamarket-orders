@@ -35,7 +35,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
-final readonly class PackageMegamarketOrderHandler
+final readonly class UpdatePackageOrderMegamarketHandler
 {
     public function __construct(
         #[Target('megamarketOrdersLogger')] private LoggerInterface $logger,
@@ -48,7 +48,7 @@ final readonly class PackageMegamarketOrderHandler
      * Метод отправляет уведомление Megamarket
      * об комплектации заказа (принят в обработку)
      */
-    public function __invoke(PackageMegamarketOrderMessage $message): void
+    public function __invoke(UpdatePackageOrderMegamarketMessage $message): void
     {
 
         /** Получаем информацию о заказе */
@@ -117,7 +117,7 @@ final readonly class PackageMegamarketOrderHandler
         $this->retry($message);
     }
 
-    private function retry(PackageMegamarketOrderMessage $message): void
+    private function retry(UpdatePackageOrderMegamarketMessage $message): void
     {
 
         $this->logger->critical(

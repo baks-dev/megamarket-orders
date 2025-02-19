@@ -25,8 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\Tests;
 
-use BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\PackageMegamarketOrderHandler;
-use BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\PackageMegamarketOrderMessage;
+use BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\UpdatePackageOrderMegamarketHandler;
+use BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\UpdatePackageOrderMegamarketMessage;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
@@ -51,10 +51,10 @@ class PackageMegamarketOrderHandlerTest extends KernelTestCase
         $event = new ConsoleCommandEvent(new Command(), new StringInput(''), new NullOutput());
         $dispatcher->dispatch($event, 'console.command');
 
-        /** @var PackageMegamarketOrderHandler $PackageMegamarketOrderHandler */
-        $PackageMegamarketOrderHandler = self::getContainer()->get(PackageMegamarketOrderHandler::class);
+        /** @var UpdatePackageOrderMegamarketHandler $PackageMegamarketOrderHandler */
+        $PackageMegamarketOrderHandler = self::getContainer()->get(UpdatePackageOrderMegamarketHandler::class);
 
-        $PackageMegamarketOrderMessage = new PackageMegamarketOrderMessage(
+        $PackageMegamarketOrderMessage = new UpdatePackageOrderMegamarketMessage(
             '11111111111',
             new UserProfileUid()
         );
