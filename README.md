@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-7.2.7-blue)](https://github.com/baks-dev/megamarket-orders/releases)
 ![php 8.4+](https://img.shields.io/badge/php-min%208.4-red.svg)
-[![packagist](https://img.shields.io/badge/packagist-green)](https://packagist.org/packages/baks-dev/)
+[![packagist](https://img.shields.io/badge/packagist-green)](https://packagist.org/packages/baks-dev/megamarket-orders)
 
 Модуль заказов Megamarket
 
