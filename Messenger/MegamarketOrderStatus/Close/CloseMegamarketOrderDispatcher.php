@@ -27,12 +27,17 @@ namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Close;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryDbsMegamarket;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
+use BaksDev\Ozon\Orders\Type\DeliveryType\TypeDeliveryFbsOzon;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusCompleted;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -46,10 +51,10 @@ final readonly class CloseMegamarketOrderDispatcher
 {
     public function __construct(
         #[Target('megamarketOrdersLogger')] private LoggerInterface $logger,
-        private OrderEventInterface $orderEvent,
+        private OrderEventInterface $OrderEvent,
+        private CurrentOrderEventInterface $CurrentOrderEvent,
         private DeduplicatorInterface $deduplicator,
-        private MessageDispatchInterface $messageDispatch,
-        private NumberByOrderInterface $NumberByOrderRepository,
+        private MessageDispatchInterface $messageDispatch
     ) {}
 
 
@@ -69,54 +74,47 @@ final readonly class CloseMegamarketOrderDispatcher
         }
 
         /** @var OrderEvent $OrderEvent */
-        $OrderEvent = $this->orderEvent->find($message->getEvent());
+        $OrderEvent = $this->OrderEvent
+            ->find($message->getEvent());
 
-        if(!$OrderEvent)
+        if(false === ($OrderEvent instanceof OrderEvent))
         {
             $this->logger->critical(
                 'products-sign: Не найдено событие OrderEvent',
-                [self::class.':'.__LINE__, 'OrderEventUid' => (string) $message->getEvent()]
+                [self::class.':'.__LINE__, var_export($message, true)]
             );
 
             return;
         }
-
 
         if($OrderEvent->isStatusEquals(OrderStatusCompleted::class) === false)
         {
             return;
         }
 
-        $number = $OrderEvent->getOrderNumber();
+        /** Если тип заказа не DBS Megamarket «Доставка собственной службой» */
+        $DeliveryUid = $OrderEvent->getDelivery()?->getDeliveryType();
 
-        if($number === null)
-        {
-            /** Пробуем определить номер по идентификатору заказа если событие изменилось */
-
-            $number = $this->NumberByOrderRepository
-                ->forOrder($message->getId())
-                ->find();
-
-            if(false === $number)
-            {
-                $this->logger->critical(
-                    'megamarket-orders: Невозможно определить номер заказа (возможно изменилось событие)',
-                    [self::class.':'.__LINE__, 'OrderUid' => (string) $message->getId()]
-                );
-
-                return;
-            }
-        }
-
-        /** Проверяем, что номер заявки начинается с M- (Megamarket) */
-        if(false === str_starts_with($number, 'M-'))
+        if(is_null($DeliveryUid) || false === $DeliveryUid->equals(TypeDeliveryDbsMegamarket::class))
         {
             return;
         }
 
+        /** Получаем активное событие заказа в случае если статус заказа изменился */
+        if(false === ($OrderEvent->getOrderProfile() instanceof UserProfileUid))
+        {
+            $OrderEvent = $this->CurrentOrderEvent
+                ->forOrder($message->getId())
+                ->find();
+
+            if(false === ($OrderEvent instanceof OrderEvent))
+            {
+                return;
+            }
+        }
 
         $CloseMegamarketOrderMessage = new CloseMegamarketOrderMessage(
-            $number,
+            $OrderEvent->getOrderNumber(),
             $OrderEvent->getOrderProfile()
         );
 

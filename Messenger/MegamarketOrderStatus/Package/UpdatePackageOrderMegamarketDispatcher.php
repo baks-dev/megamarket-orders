@@ -27,11 +27,14 @@ namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryDbsMegamarket;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -44,10 +47,10 @@ final readonly class UpdatePackageOrderMegamarketDispatcher
 {
     public function __construct(
         #[Target('megamarketOrdersLogger')] private LoggerInterface $logger,
-        private OrderEventInterface $orderEvent,
+        private OrderEventInterface $OrderEventRepository,
+        private CurrentOrderEventInterface $CurrentOrderEvent,
         private DeduplicatorInterface $deduplicator,
-        private MessageDispatchInterface $messageDispatch,
-        private NumberByOrderInterface $NumberByOrderRepository,
+        private MessageDispatchInterface $messageDispatch
     ) {}
 
 
@@ -73,9 +76,10 @@ final readonly class UpdatePackageOrderMegamarketDispatcher
         }
 
         /** @var OrderEvent $OrderEvent */
-        $OrderEvent = $this->orderEvent->find($message->getEvent());
+        $OrderEvent = $this->OrderEventRepository
+            ->find($message->getEvent());
 
-        if(!$OrderEvent)
+        if(false === ($OrderEvent instanceof OrderEvent))
         {
             $this->logger->critical(
                 'products-sign: Не найдено событие OrderEvent',
@@ -90,37 +94,30 @@ final readonly class UpdatePackageOrderMegamarketDispatcher
             return;
         }
 
-        $number = $OrderEvent->getOrderNumber();
+        /** Если тип заказа не DBS Megamarket «Доставка собственной службой» */
+        $DeliveryUid = $OrderEvent->getDelivery()?->getDeliveryType();
 
-        if($number === null)
-        {
-            /**
-             * Пробуем определить номер по идентификатору заказа если событие изменилось
-             */
-
-            $number = $this->NumberByOrderRepository
-                ->forOrder($message->getId())
-                ->find();
-
-            if(false === $number)
-            {
-                $this->logger->critical(
-                    'megamarket-orders: Невозможно определить номер заказа (возможно изменилось событие)',
-                    [self::class.':'.__LINE__, 'OrderUid' => (string) $message->getId()]
-                );
-
-                return;
-            }
-        }
-
-        /** Проверяем, что номер заявки начинается с M- (Megamarket) */
-        if(false === str_starts_with($number, 'M-'))
+        if(is_null($DeliveryUid) || false === $DeliveryUid->equals(TypeDeliveryDbsMegamarket::class))
         {
             return;
         }
 
+
+        /** Получаем активное событие заказа в случае если статус заказа изменился */
+        if(false === ($OrderEvent->getOrderProfile() instanceof UserProfileUid))
+        {
+            $OrderEvent = $this->CurrentOrderEvent
+                ->forOrder($message->getId())
+                ->find();
+
+            if(false === ($OrderEvent instanceof OrderEvent))
+            {
+                return;
+            }
+        }
+
         $PackageMegamarketOrderMessage = new UpdatePackageOrderMegamarketMessage(
-            $number,
+            $OrderEvent->getOrderNumber(),
             $OrderEvent->getOrderProfile()
         );
 
@@ -130,6 +127,5 @@ final readonly class UpdatePackageOrderMegamarketDispatcher
         );
 
         $Deduplicator->save();
-
     }
 }
