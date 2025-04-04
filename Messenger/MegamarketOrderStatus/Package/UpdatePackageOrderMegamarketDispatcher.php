@@ -112,6 +112,11 @@ final readonly class UpdatePackageOrderMegamarketDispatcher
 
             if(false === ($OrderEvent instanceof OrderEvent))
             {
+                $this->logger->critical(
+                    'megamarket-orders: Не найдено событие OrderEvent',
+                    [self::class.':'.__LINE__, var_export($message, true)]
+                );
+
                 return;
             }
         }
