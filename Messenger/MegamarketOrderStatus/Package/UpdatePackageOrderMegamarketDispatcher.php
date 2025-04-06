@@ -33,7 +33,7 @@ use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
-use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusNew;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;

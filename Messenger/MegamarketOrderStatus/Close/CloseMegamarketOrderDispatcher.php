@@ -33,7 +33,7 @@ use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Repository\OrderNumber\NumberByOrder\NumberByOrderInterface;
-use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusCompleted;
 use BaksDev\Ozon\Orders\Type\DeliveryType\TypeDeliveryFbsOzon;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusCompleted;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
