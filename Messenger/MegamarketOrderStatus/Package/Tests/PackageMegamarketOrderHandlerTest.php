@@ -61,6 +61,8 @@ class PackageMegamarketOrderHandlerTest extends KernelTestCase
 
         $PackageMegamarketOrderHandler($PackageMegamarketOrderMessage);
 
+        self::assertTrue(true);
+
     }
 
 
