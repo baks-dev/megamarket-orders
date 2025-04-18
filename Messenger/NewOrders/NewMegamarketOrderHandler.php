@@ -241,8 +241,11 @@ final readonly class NewMegamarketOrderHandler
         }
 
         /** Присваиваем активное событие доставки */
-        $DeliveryEvent = $this->currentDeliveryEvent->get($OrderDeliveryDTO->getDelivery());
-        $OrderDeliveryDTO->setEvent($DeliveryEvent?->getId());
+        $DeliveryEvent = $this->currentDeliveryEvent
+            ->forDelivery($OrderDeliveryDTO->getDelivery())
+            ->getId();
+
+        $OrderDeliveryDTO->setEvent($DeliveryEvent);
 
         $products = [];
 
