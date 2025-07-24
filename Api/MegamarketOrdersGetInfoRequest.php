@@ -44,11 +44,13 @@ final class MegamarketOrdersGetInfoRequest extends Megamarket
         $order = (string) $order;
         $order = str_replace('M-', '', $order);
 
+        // 	https://api.megamarket.tech/api/market/v1/orderService/order/get
+
         try
         {
             $response = $this->TokenHttpClient()
                 ->request(
-                    'GET',
+                    'POST',
                     '/api/market/v1/orderService/order/get',
                     ['json' =>
                         [

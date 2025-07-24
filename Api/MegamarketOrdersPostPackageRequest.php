@@ -109,7 +109,7 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
         {
             $response = $this->TokenHttpClient()
                 ->request(
-                    'GET',
+                    'POST',
                     '/api/market/v1/orderService/order/packing',
                     ['json' => $data],
                 );
