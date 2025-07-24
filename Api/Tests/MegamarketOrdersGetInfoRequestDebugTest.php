@@ -23,6 +23,7 @@
 
 declare(strict_types=1);
 
+namespace BaksDev\Megamarket\Orders\Api\Tests;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
@@ -33,7 +34,6 @@ use PHPUnit\Framework\Attributes\DependsOnClass;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
-
 
 /**
  * @group megamarket-orders
