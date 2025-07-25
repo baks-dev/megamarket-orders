@@ -68,6 +68,15 @@ final readonly class UpdatePackageOrderMegamarketHandler
             return;
         }
 
+        /** Если статус еще не обновлен - пробуем через минуту */
+        if(empty($MegamarketOrder['status']))
+        {
+            // Пробуем упаковать заказ через минуту
+            $this->retry($message);
+
+            return;
+        }
+
         if($MegamarketOrder['status'] !== 'NEW')
         {
             $this->logger->critical(
