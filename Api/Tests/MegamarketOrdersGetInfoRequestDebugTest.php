@@ -35,11 +35,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group megamarket-orders
- */
-#[Group('megamarket-orders')]
 #[When(env: 'test')]
+#[Group('megamarket-orders')]
 class MegamarketOrdersGetInfoRequestDebugTest extends KernelTestCase
 {
     private static MegamarketAuthorizationToken $Authorization;

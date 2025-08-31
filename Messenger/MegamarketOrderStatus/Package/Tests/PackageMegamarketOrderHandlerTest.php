@@ -28,6 +28,7 @@ namespace BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\Test
 use BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\UpdatePackageOrderMegamarketHandler;
 use BaksDev\Megamarket\Orders\Messenger\MegamarketOrderStatus\Package\UpdatePackageOrderMegamarketMessage;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -36,11 +37,8 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-
-/**
- * @group package-megamarket-order-handler-test
- */
 #[When(env: 'test')]
+#[Group('megamarket-orders')]
 class PackageMegamarketOrderHandlerTest extends KernelTestCase
 {
 

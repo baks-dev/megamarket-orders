@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -30,13 +30,12 @@ use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
 use BaksDev\Megamarket\Type\Authorization\MegamarketAuthorizationToken;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group megamarket-orders
- */
 #[When(env: 'test')]
+#[Group('megamarket-orders')]
 class MegamarketOrdersPackageRequestTest extends KernelTestCase
 {
     private static MegamarketAuthorizationToken $Authorization;
