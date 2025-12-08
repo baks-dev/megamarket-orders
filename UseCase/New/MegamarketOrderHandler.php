@@ -84,10 +84,7 @@ final class MegamarketOrderHandler extends AbstractHandler
             $OrderUserDTO->setProfile($UserProfileEvent);
         }
 
-
-        $Order = new Order();
-        $Order->setNumber($command->getNumber());
-        $this->preEventPersistOrUpdate($Order, OrderEvent::class);
+        $this->preEventPersistOrUpdate(Order::class, OrderEvent::class);
 
 
         /** Валидация всех объектов */
