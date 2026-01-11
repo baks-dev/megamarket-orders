@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -84,18 +84,18 @@ final readonly class CloseMegamarketOrderDispatcher
             return;
         }
 
+        /** Если тип заказа не DBS Megamarket «Доставка собственной службой» */
+        if(false === $OrderEvent->isDeliveryTypeEquals(TypeDeliveryDbsMegamarket::TYPE))
+        {
+            $Deduplicator->save();
+            return;
+        }
+
         if($OrderEvent->isStatusEquals(OrderStatusCompleted::class) === false)
         {
             return;
         }
 
-        /** Если тип заказа не DBS Megamarket «Доставка собственной службой» */
-        $DeliveryUid = $OrderEvent->getDelivery()?->getDeliveryType();
-
-        if(is_null($DeliveryUid) || false === $DeliveryUid->equals(TypeDeliveryDbsMegamarket::class))
-        {
-            return;
-        }
 
         /** Получаем активное событие заказа в случае если статус заказа изменился */
         if(false === ($OrderEvent->getOrderProfile() instanceof UserProfileUid))
