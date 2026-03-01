@@ -28,7 +28,9 @@ namespace BaksDev\Megamarket\Orders\Api;
 use BaksDev\Megamarket\Api\Megamarket;
 use Exception;
 use stdClass;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(public: true)]
 final class MegamarketOrdersGetInfoRequest extends Megamarket
 {
     /**

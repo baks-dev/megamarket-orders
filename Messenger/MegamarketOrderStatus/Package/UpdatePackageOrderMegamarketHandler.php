@@ -31,9 +31,11 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersGetInfoRequest;
 use BaksDev\Megamarket\Orders\Api\MegamarketOrdersPostPackageRequest;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[Autoconfigure(public: true)]
 #[AsMessageHandler(priority: 0)]
 final readonly class UpdatePackageOrderMegamarketHandler
 {
