@@ -30,7 +30,7 @@ use Exception;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-#[Autoconfigure(public: true)]
+// #[Autoconfigure(public: true)]
 final class MegamarketOrdersGetInfoRequest extends Megamarket
 {
     /**
