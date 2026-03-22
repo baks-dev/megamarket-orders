@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\Commands\Upgrade\FBS;
 
 use BaksDev\Core\Type\Field\InputField;
+use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileFbsMegamarket;
 use BaksDev\Users\Profile\TypeProfile\Entity\TypeProfile;
 use BaksDev\Users\Profile\TypeProfile\Repository\ExistTypeProfile\ExistTypeProfileInterface;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
@@ -36,7 +37,6 @@ use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\Section\Trans\Sectio
 use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\Trans\TransDTO;
 use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\TypeProfileDTO;
 use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\TypeProfileHandler;
-use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileFbsMegamarket;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,7 +55,8 @@ class UpgradeProfileTypeFbsMegamarketCommand extends Command
         private readonly ExistTypeProfileInterface $existTypeProfile,
         private readonly TranslatorInterface $translator,
         private readonly TypeProfileHandler $profileHandler,
-    ) {
+    )
+    {
         parent::__construct();
     }
 

@@ -26,10 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Megamarket\Orders\UseCase\New\User\Payment;
 
 
+use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentFbsMegamarket;
 use BaksDev\Orders\Order\Entity\User\Payment\OrderPaymentInterface;
 use BaksDev\Payment\Type\Id\Choice\TypePaymentCache;
 use BaksDev\Payment\Type\Id\PaymentUid;
-use BaksDev\Megamarket\Orders\Type\PaymentType\TypePaymentFbsMegamarket;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 

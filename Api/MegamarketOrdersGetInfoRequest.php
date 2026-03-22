@@ -65,9 +65,9 @@ final class MegamarketOrdersGetInfoRequest extends Megamarket
                             'meta' => new stdClass(),
                             'data' => [
                                 "token" => $this->getToken(),
-                                "shipments" => [$order]
-                            ]
-                        ]
+                                "shipments" => [$order],
+                            ],
+                        ],
                     ],
                 );
 
@@ -78,7 +78,7 @@ final class MegamarketOrdersGetInfoRequest extends Megamarket
         {
             $this->logger->critical(
                 sprintf('megamarket-orders: Ошибка при получении информации о заказе %s', $order),
-                [self::class, $exception->getMessage()]
+                [self::class, $exception->getMessage()],
             );
 
             return false;

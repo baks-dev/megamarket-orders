@@ -94,7 +94,7 @@ final readonly class CloseMegamarketOrderHandler
         {
             $this->logger->info(
                 sprintf('%s: Обновили статус «Выдан по месту назначения»', $number),
-                [self::class.':'.__LINE__]
+                [self::class.':'.__LINE__],
             );
 
             return;
@@ -112,13 +112,13 @@ final readonly class CloseMegamarketOrderHandler
     {
         $this->logger->critical(
             sprintf('megamarket-orders: Пробуем закрыть заказ %s через 1 минуту', $message->getNumber()),
-            [self::class.':'.__LINE__]
+            [self::class.':'.__LINE__],
         );
 
         $this->messageDispatch->dispatch(
             message: $message,
             stamps: [new MessageDelay('1 minutes')],
-            transport: 'megamarket-orders'
+            transport: 'megamarket-orders',
         );
     }
 }

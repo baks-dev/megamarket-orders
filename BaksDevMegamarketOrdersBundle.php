@@ -51,17 +51,17 @@ class BaksDevMegamarketOrdersBundle extends AbstractBundle
 
         $services->load(
             self::NAMESPACE.'Type\DeliveryType\\',
-            self::PATH.'Type/DeliveryType'
+            self::PATH.'Type/DeliveryType',
         );
 
         $services->load(
             self::NAMESPACE.'Type\ProfileType\\',
-            self::PATH.'Type/ProfileType'
+            self::PATH.'Type/ProfileType',
         );
 
         $services->load(
             self::NAMESPACE.'Type\PaymentType\\',
-            self::PATH.'Type/PaymentType'
+            self::PATH.'Type/PaymentType',
         );
     }
 }

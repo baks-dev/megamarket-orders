@@ -52,7 +52,8 @@ class UpdateNewOrdersCommand extends Command
         private readonly MegamarketOrdersGetNewsRequest $megamarketNewOrdersRequest,
         private readonly ExistsOrderNumberInterface $existsOrderNumber,
         private readonly MessageDispatchInterface $messageDispatch
-    ) {
+    )
+    {
         parent::__construct();
     }
 
@@ -79,7 +80,7 @@ class UpdateNewOrdersCommand extends Command
         $question = new ChoiceQuestion(
             'Профиль пользователя',
             $questions,
-            0
+            0,
         );
 
         $profileName = $helper->ask($input, $output, $question);

@@ -28,8 +28,6 @@ namespace BaksDev\Megamarket\Orders\Controller\Megamarket;
 use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Core\Type\UidType\ParamConverter;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\User\Type\Id\UserUid;
@@ -53,7 +51,8 @@ final class CancelController extends AbstractController
         MessageDispatchInterface $messageDispatch,
         LoggerInterface $megamarketOrdersLogger,
         #[ParamConverter(UserProfileUid::class)] $profile = null,
-    ): Response {
+    ): Response
+    {
 
         if(empty($profile))
         {
@@ -70,6 +69,7 @@ final class CancelController extends AbstractController
 
         /**
          * Делаем отмену заказа
+         *
          * @see https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-cancel-standart
          */
 

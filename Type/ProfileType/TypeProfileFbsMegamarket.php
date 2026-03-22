@@ -34,17 +34,6 @@ final class TypeProfileFbsMegamarket implements TypeProfileInterface
     /** Megamarket FBS */
     public const string TYPE = '0bf0fbae-1b3e-7338-9534-e7b9ab34ab8d';
 
-    public function __toString(): string
-    {
-        return self::TYPE;
-    }
-
-    /** Возвращает значение (value) */
-    public function getValue(): string
-    {
-        return self::TYPE;
-    }
-
     /** Сортировка */
     public static function priority(): int
     {
@@ -54,5 +43,16 @@ final class TypeProfileFbsMegamarket implements TypeProfileInterface
     public static function equals(mixed $uid): bool
     {
         return self::TYPE === (string) $uid;
+    }
+
+    public function __toString(): string
+    {
+        return self::TYPE;
+    }
+
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::TYPE;
     }
 }

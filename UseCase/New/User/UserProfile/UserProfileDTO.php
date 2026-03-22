@@ -28,7 +28,6 @@ namespace BaksDev\Megamarket\Orders\UseCase\New\User\UserProfile;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\UserProfileEventInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Event\UserProfileEventUid;
-use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileFbsMegamarket;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -63,18 +62,17 @@ final class UserProfileDTO implements UserProfileEventInterface
         return $this->id;
     }
 
+    public function getType(): ?TypeProfileUid
+    {
+        return $this->type;
+    }
+
     /** Тип профиля */
 
     public function setType(?TypeProfileUid $type): void
     {
         $this->type = $type;
     }
-
-    public function getType(): ?TypeProfileUid
-    {
-        return $this->type;
-    }
-
 
     /** Информация профиля */
 

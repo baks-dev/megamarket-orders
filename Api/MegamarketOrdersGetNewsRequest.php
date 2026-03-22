@@ -64,9 +64,9 @@ final class MegamarketOrdersGetNewsRequest extends Megamarket
                                 "token" => $this->getToken(),
                                 "dateFrom" => $this->fromDate->format(DateTimeInterface::W3C),
                                 "dateTo" => $dateTime->format(DateTimeInterface::W3C),
-                                "statuses" => ["NEW"]
-                            ]
-                        ]
+                                "statuses" => ["NEW"],
+                            ],
+                        ],
                     ],
                 );
 

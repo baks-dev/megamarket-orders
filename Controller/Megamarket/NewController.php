@@ -29,8 +29,6 @@ use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Core\Type\UidType\ParamConverter;
 use BaksDev\Megamarket\Orders\Messenger\NewOrders\NewMegamarketOrderMessage;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderDTO;
-use BaksDev\Megamarket\Orders\UseCase\New\MegamarketOrderHandler;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\User\Type\Id\UserUid;
@@ -54,7 +52,8 @@ final class NewController extends AbstractController
         LoggerInterface $megamarketOrdersLogger,
         MessageDispatchInterface $messageDispatch,
         #[ParamConverter(UserProfileUid::class)] $profile = null,
-    ): Response {
+    ): Response
+    {
 
         if(empty($profile))
         {
@@ -70,6 +69,7 @@ final class NewController extends AbstractController
 
         /**
          * Создаем новый заказ
+         *
          * @see https://partner-wiki.megamarket.ru/merchant-api/2-opisanie-api-fbs/2-1-rabota-s-api-vyzovami/order-new-standart
          */
 
@@ -85,6 +85,6 @@ final class NewController extends AbstractController
         /** DBS */
         $json = '{"meta":{},"data":{"shipments":[{"shipmentId":"9324005526611","shipmentDate":"2024-08-09T16:12:28+03:00","handover":{"packingDate":"2024-08-09T19:00:00+03:00","reserveExpirationDate":"2024-08-29T00:00:00+03:00","outletId":"","serviceScheme":"DELIVERY_BY_MERCHANT","depositedAmount":30584,"deliveryInterval":{"dateFrom":"2024-08-13T10:00:00+03:00","dateTo":"2024-08-15T20:00:00+03:00"},"deliveryId":9385695846770},"customer":{"customerFullName":"Абдуллин Галим","phone":"79153693033","email":"","address":{"source":"Москва, улица Вавилова, 70 к3","postalCode":"119261","fias":{"regionId":"0c5b2444-70a0-4932-980c-b4dc0d3f02b5","destinationId":"0455c6b3-793f-457d-8b42-78b979b947e2"},"geo":{"lat":"55.683041","lon":"37.546646"},"access":{"detachedHouse":false,"entrance":null,"floor":null,"intercom":null,"cargoElevator":false,"comment":"предварительно позвоните за 3-4 часа до доставки.","apartment":""},"regionKladrId":"77","house":"70 к3","block":null,"flat":null,"regionWithType":"Москва","cityWithType":"Москва","cityArea":null,"streetWithType":"улица Вавилова"}},"flags":[],"items":[{"itemIndex":"1","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"2","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"3","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"4","goodsId":"100030313902","offerId":"PL02-19-235-40-96W","itemName":"Шины Triangle SnowLink PL02 235/40 R19 96W","price":7446,"finalPrice":7446,"discounts":[],"quantity":1,"taxRate":"20","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"5","goodsId":"100029275905","offerId":"delivery","itemName":"Доставка","price":800,"finalPrice":800,"discounts":[],"quantity":1,"taxRate":null,"reservationPerformed":true,"isDigitalMarkRequired":false}]}],"merchantId":175306}}';
 
-        return json_decode($json, );
+        return json_decode($json);
     }
 }

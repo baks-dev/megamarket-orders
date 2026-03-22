@@ -34,11 +34,11 @@ use BaksDev\Delivery\UseCase\Admin\NewEdit\DeliveryHandler;
 use BaksDev\Delivery\UseCase\Admin\NewEdit\Fields\DeliveryFieldDTO;
 use BaksDev\Delivery\UseCase\Admin\NewEdit\Fields\Trans\DeliveryFieldTransDTO;
 use BaksDev\Delivery\UseCase\Admin\NewEdit\Trans\DeliveryTransDTO;
+use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryFbsMegamarket;
+use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileFbsMegamarket;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
-use BaksDev\Megamarket\Orders\Type\DeliveryType\TypeDeliveryFbsMegamarket;
-use BaksDev\Megamarket\Orders\Type\ProfileType\TypeProfileFbsMegamarket;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -57,7 +57,8 @@ class UpgradeDeliveryTypeFbsMegamarketCommand extends Command
         private readonly ExistTypeDeliveryInterface $existTypeDelivery,
         private readonly TranslatorInterface $translator,
         private readonly DeliveryHandler $deliveryHandler
-    ) {
+    )
+    {
         parent::__construct();
     }
 

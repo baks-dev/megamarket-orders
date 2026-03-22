@@ -71,7 +71,7 @@ class MegamarketFbsCommands extends Command
         $question = new ChoiceQuestion(
             'Выберите комманду для выполнения',
             $questions,
-            0
+            0,
         );
 
         $answer = $helper->ask($input, $output, $question);

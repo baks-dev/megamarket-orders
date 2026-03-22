@@ -27,4 +27,4 @@ namespace BaksDev\Megamarket\Orders\Messenger;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class MegamarketOrdersMessage {}
+final class MegamarketOrdersMessage { }

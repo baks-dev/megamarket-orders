@@ -98,7 +98,7 @@ final class MegamarketOrderHandler extends AbstractHandler
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(
             message: new OrderMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
-            transport: 'orders-order'
+            transport: 'orders-order',
         );
 
         return $this->main;

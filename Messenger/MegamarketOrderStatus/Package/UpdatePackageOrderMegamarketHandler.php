@@ -88,7 +88,7 @@ final readonly class UpdatePackageOrderMegamarketHandler
         {
             $this->logger->critical(
                 sprintf('megamarket-orders: Невозможно обновить статус не нового заказа %s', $message->getNumber()),
-                [$MegamarketOrder, self::class.':'.__LINE__]
+                [$MegamarketOrder, self::class.':'.__LINE__],
             );
 
             return;
@@ -123,7 +123,7 @@ final readonly class UpdatePackageOrderMegamarketHandler
         {
             $this->logger->info(
                 sprintf('%s: Обновили статус «Укомплектована, готова к выдаче»', $number),
-                [$message, self::class.':'.__LINE__]
+                [$message, self::class.':'.__LINE__],
             );
 
             return;
@@ -138,13 +138,13 @@ final readonly class UpdatePackageOrderMegamarketHandler
 
         $this->logger->critical(
             sprintf('megamarket-orders: Пробуем упаковать заказ %s через 1 минуту', $message->getNumber()),
-            [$message, self::class.':'.__LINE__]
+            [$message, self::class.':'.__LINE__],
         );
 
         $this->messageDispatch->dispatch(
             message: $message,
             stamps: [new MessageDelay('1 minutes')],
-            transport: 'megamarket-orders-low'
+            transport: 'megamarket-orders-low',
         );
     }
 }

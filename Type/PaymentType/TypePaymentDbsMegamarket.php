@@ -36,17 +36,6 @@ final class TypePaymentDbsMegamarket implements TypePaymentInterface
      */
     public const string TYPE = 'c376a705-c657-7298-966f-8e4e50ad6e9e';
 
-    public function __toString(): string
-    {
-        return self::TYPE;
-    }
-
-    /** Возвращает значение (value) */
-    public function getValue(): string
-    {
-        return self::TYPE;
-    }
-
     /** Сортировка */
     public static function priority(): int
     {
@@ -56,5 +45,16 @@ final class TypePaymentDbsMegamarket implements TypePaymentInterface
     public static function equals(mixed $uid): bool
     {
         return self::TYPE === (string) $uid;
+    }
+
+    public function __toString(): string
+    {
+        return self::TYPE;
+    }
+
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::TYPE;
     }
 }

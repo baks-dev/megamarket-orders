@@ -54,7 +54,7 @@ class PackageMegamarketOrderHandlerTest extends KernelTestCase
 
         $PackageMegamarketOrderMessage = new UpdatePackageOrderMegamarketMessage(
             '11111111111',
-            new UserProfileUid()
+            new UserProfileUid(),
         );
 
         $PackageMegamarketOrderHandler($PackageMegamarketOrderMessage);

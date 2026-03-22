@@ -25,7 +25,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Megamarket\Orders\BaksDevMegamarketOrdersBundle;
 
-return static function (ContainerConfigurator $configurator) {
+return static function(ContainerConfigurator $configurator) {
 
     $services = $configurator->services()
         ->defaults()
@@ -46,16 +46,16 @@ return static function (ContainerConfigurator $configurator) {
 
     $services->load(
         $NAMESPACE.'Type\DeliveryType\\',
-        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'DeliveryType'])
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'DeliveryType']),
     );
 
     $services->load(
         $NAMESPACE.'Type\ProfileType\\',
-        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'ProfileType'])
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'ProfileType']),
     );
 
     $services->load(
         $NAMESPACE.'Type\PaymentType\\',
-        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'PaymentType'])
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'PaymentType']),
     );
 };

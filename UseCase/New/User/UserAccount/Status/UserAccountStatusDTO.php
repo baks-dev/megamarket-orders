@@ -32,22 +32,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class UserAccountStatusDTO implements AccountStatusInterface
 {
-	#[Assert\NotBlank]
-	private readonly EmailStatus $status;
-	
-	
-	public function __construct()
-	{
-		$this->status = new EmailStatus(EmailStatusNew::class);
-	}
-	
-	/**
-	 * @return EmailStatus
-	 */
-	public function getStatus() : EmailStatus
-	{
-		return $this->status;
-	}
-	
+    #[Assert\NotBlank]
+    private readonly EmailStatus $status;
+
+
+    public function __construct()
+    {
+        $this->status = new EmailStatus(EmailStatusNew::class);
+    }
+
+    /**
+     * @return EmailStatus
+     */
+    public function getStatus(): EmailStatus
+    {
+        return $this->status;
+    }
+
 }
 

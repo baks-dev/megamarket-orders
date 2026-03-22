@@ -41,7 +41,8 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
     /**
      * Данные о лотах
      *
-     * DBS: @see https://partner-wiki.megamarket.ru/merchant-api/4-opisanie-api-dbs/4-1-dbs-s-tsentral-nogo-sklada/4-1-1-opisanie-metodov/4-3-4-order-packing
+     * DBS: @see
+     * https://partner-wiki.megamarket.ru/merchant-api/4-opisanie-api-dbs/4-1-dbs-s-tsentral-nogo-sklada/4-1-1-opisanie-metodov/4-3-4-order-packing
      * {
      * "itemIndex": 1,
      * "quantity": 1
@@ -117,9 +118,9 @@ final class MegamarketOrdersPostCloseRequest extends Megamarket
                 "shipments" => [[
                     'shipmentId' => $order,
                     'closeDate' => $closeDate,
-                    'items' => $this->items
-                ]]
-            ]
+                    'items' => $this->items,
+                ]],
+            ],
         ];
 
         try

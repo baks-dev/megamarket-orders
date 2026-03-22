@@ -34,17 +34,6 @@ final class TypeDeliveryFbsMegamarket implements TypeDeliveryInterface
     /** Megamarket FBS */
     public const string TYPE = '8e0442be-3363-74fd-b2fd-e08249fbd2a3';
 
-    public function __toString(): string
-    {
-        return self::TYPE;
-    }
-
-    /** Возвращает значение (value) */
-    public function getValue(): string
-    {
-        return self::TYPE;
-    }
-
     /** Сортировка */
     public static function priority(): int
     {
@@ -54,5 +43,16 @@ final class TypeDeliveryFbsMegamarket implements TypeDeliveryInterface
     public static function equals(mixed $uid): bool
     {
         return self::TYPE === (string) $uid;
+    }
+
+    public function __toString(): string
+    {
+        return self::TYPE;
+    }
+
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::TYPE;
     }
 }

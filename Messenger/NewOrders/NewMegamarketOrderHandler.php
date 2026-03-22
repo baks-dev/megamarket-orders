@@ -308,7 +308,7 @@ final readonly class NewMegamarketOrderHandler
 
         $this->logger->critical(
             sprintf('Megamarket: Ошибка %s при добавлении заказа #%s', $Order, $message->getShipment()),
-            [self::class.':'.__LINE__]
+            [self::class.':'.__LINE__],
         );
         return false;
 

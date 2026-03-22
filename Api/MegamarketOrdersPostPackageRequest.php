@@ -39,7 +39,8 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
     /**
      * Данные о лотах
      *
-     * DBS: @see https://partner-wiki.megamarket.ru/merchant-api/4-opisanie-api-dbs/4-1-dbs-s-tsentral-nogo-sklada/4-1-1-opisanie-metodov/4-3-4-order-packing
+     * DBS: @see
+     * https://partner-wiki.megamarket.ru/merchant-api/4-opisanie-api-dbs/4-1-dbs-s-tsentral-nogo-sklada/4-1-1-opisanie-metodov/4-3-4-order-packing
      * {
      * "itemIndex": 1,
      * "quantity": 1
@@ -100,9 +101,9 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
                 "shipments" => [[
                     'shipmentId' => $order,
                     'orderCode' => $order,
-                    'items' => $this->items
-                ]]
-            ]
+                    'items' => $this->items,
+                ]],
+            ],
         ];
 
         try
@@ -121,7 +122,7 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
         {
             $this->logger->critical(
                 'megamarket-orders: Ошибка при подтверждении упаковки заказа %s',
-                [$data, $exception]
+                [$data, $exception],
             );
 
             return false;
@@ -131,7 +132,7 @@ final class MegamarketOrdersPostPackageRequest extends Megamarket
         {
             $this->logger->critical(
                 'megamarket-orders: Ошибка при подтверждении упаковки заказа %s',
-                [$data, $content]
+                [$data, $content],
             );
             return false;
         }

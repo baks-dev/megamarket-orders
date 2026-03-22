@@ -24,7 +24,7 @@
 use BaksDev\Megamarket\Orders\BaksDevMegamarketOrdersBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-return function (RoutingConfigurator $routes) {
+return function(RoutingConfigurator $routes) {
 
     $MODULE = BaksDevMegamarketOrdersBundle::PATH;
 
@@ -32,7 +32,7 @@ return function (RoutingConfigurator $routes) {
         $MODULE.'Controller',
         'attribute',
         false,
-        $MODULE.implode(DIRECTORY_SEPARATOR, ['Controller', '**', '*Test.php'])
+        $MODULE.implode(DIRECTORY_SEPARATOR, ['Controller', '**', '*Test.php']),
     )
         ->prefix(\BaksDev\Core\Type\Locale\Locale::routes())
         ->namePrefix('megamarket-orders:');

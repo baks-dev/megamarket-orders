@@ -62,7 +62,7 @@ final readonly class CloseMegamarketOrderDispatcher
             ->deduplication([
                 (string) $message->getId(),
                 ProductStockStatusCompleted::STATUS,
-                self::class
+                self::class,
             ]);
 
         if($Deduplicator->isExecuted())
@@ -78,7 +78,7 @@ final readonly class CloseMegamarketOrderDispatcher
         {
             $this->logger->critical(
                 'products-sign: Не найдено событие OrderEvent',
-                [self::class.':'.__LINE__, var_export($message, true)]
+                [self::class.':'.__LINE__, var_export($message, true)],
             );
 
             return;
@@ -108,7 +108,7 @@ final readonly class CloseMegamarketOrderDispatcher
             {
                 $this->logger->critical(
                     'megamarket-orders: Не найдено событие OrderEvent',
-                    [self::class.':'.__LINE__, var_export($message, true)]
+                    [self::class.':'.__LINE__, var_export($message, true)],
                 );
 
                 return;
@@ -117,12 +117,12 @@ final readonly class CloseMegamarketOrderDispatcher
 
         $CloseMegamarketOrderMessage = new CloseMegamarketOrderMessage(
             $OrderEvent->getOrderNumber(),
-            $OrderEvent->getOrderProfile()
+            $OrderEvent->getOrderProfile(),
         );
 
         $this->messageDispatch->dispatch(
             message: $CloseMegamarketOrderMessage,
-            transport: 'megamarket-orders'
+            transport: 'megamarket-orders',
         );
 
         $Deduplicator->save();
