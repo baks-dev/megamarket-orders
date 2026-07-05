@@ -25,11 +25,11 @@ declare(strict_types=1);
 
 namespace BaksDev\Megamarket\Orders\UseCase\New\User\Payment\Field;
 
-
 use BaksDev\Orders\Order\Entity\User\Payment\Field\OrderPaymentFieldInterface;
 use BaksDev\Payment\Type\Field\PaymentFieldUid;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/** @see OrderPaymentField */
 final class OrderPaymentFieldDTO implements OrderPaymentFieldInterface
 {
     /** Идентификатор пользовательского поля в способе оплаты */
@@ -37,8 +37,7 @@ final class OrderPaymentFieldDTO implements OrderPaymentFieldInterface
     private PaymentFieldUid $field;
 
     /** Заполненное значение */
-    #[Assert\Valid]
-    private string $value;
+    private ?string $value;
 
 
     /** Идентификатор пользовательского поля в способе оплаты */
@@ -57,12 +56,12 @@ final class OrderPaymentFieldDTO implements OrderPaymentFieldInterface
 
     /** Заполненное значение */
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    public function setValue(string $value): void
+    public function setValue(?string $value): void
     {
         $this->value = $value;
     }
